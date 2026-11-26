@@ -1,0 +1,3466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Grandma — Handwritten Math Grading, Psychometrics & Principal Briefs</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Playfair Display (Editorial Serif), Inter (Clean UI), Caveat (Handwriting) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js for Psychometrics & Longitudinal Trends -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- PDF.js for Browser-Side Multi-Page PDF Rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FAF8F3',
+            card: '#FFFFFF',
+            warmborder: '#E6E1D6',
+            forest: {
+              DEFAULT: '#1B4332',
+              hover: '#143326',
+              light: '#E9F2EE',
+              mid: '#2D6A4F'
+            },
+            redpen: {
+              DEFAULT: '#B91C1C',
+              light: '#FEF2F2',
+              border: '#FECACA'
+            },
+            ink: {
+              DEFAULT: '#1F2421',
+              muted: '#5C5852',
+              subtle: '#8A847A'
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            hand: ['Caveat', 'cursive']
+          },
+          boxShadow: {
+            editorial: '0 2px 10px -2px rgba(27, 67, 50, 0.06), 0 1px 3px rgba(0,0,0,0.04)',
+            paper: '0 4px 20px -4px rgba(31, 36, 33, 0.08)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Subtle Editorial Graph-Paper Background */
+    body {
+      background-color: #FAF8F3;
+      background-image:
+        linear-gradient(to right, rgba(214, 207, 194, 0.28) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(214, 207, 194, 0.28) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #1F2421;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* Hand-drawn Red Pen Circle Effect */
+    .red-pen-circle {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #B91C1C;
+    }
+
+    .handwriting-box {
+      font-family: 'Caveat', cursive;
+      font-size: 1.3rem;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
+    }
+
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F4F0E8;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D2CBBF;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B5ADA0;
+    }
+
+    /* Dropzone Active Animation */
+    .dropzone-active {
+      border-color: #1B4332 !important;
+      background-color: #E9F2EE !important;
+      transform: scale(1.005);
+    }
+
+    /* Tab Active Indicator */
+    .tab-btn {
+      position: relative;
+      transition: all 0.18s ease;
+    }
+    .tab-btn.active {
+      color: #1B4332;
+      font-weight: 600;
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2.5px;
+      background-color: #1B4332;
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Print Styles for Executive Principal Findings Memo */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        background-image: none !important;
+        color: #000000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      #principal-memo-container {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      .print-break-avoid {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-forest-light selection:text-forest">
+
+  <!-- ==================== TOP HEADER & NAVIGATION ==================== -->
+  <header class="no-print sticky top-0 z-30 bg-[#FAF8F3]/95 backdrop-blur-md border-b border-warmborder">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Top Row: Brand + Assessment Switcher + Actions -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3.5 gap-3">
+        <!-- Brand -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-forest text-white flex items-center justify-center shadow-sm shrink-0 relative">
+            <span class="font-serif font-bold text-xl leading-none">M</span>
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-redpen text-[10px] font-bold flex items-center justify-center border-2 border-[#FAF8F3]">✓</span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-2">
+              <h1 class="font-serif text-2xl font-bold tracking-tight text-ink">
+                Math <span class="italic text-redpen">Grandma</span>
+              </h1>
+              <span id="cloud-status-badge" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-forest-light text-forest border border-forest/15">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                <span id="cloud-status-text">Ready</span>
+              </span>
+            </div>
+            <p class="text-xs text-ink-muted">Handwritten Math Grading, Psychometrics &amp; Principal Briefs</p>
+          </div>
+        </div>
+
+        <!-- Assessment Switcher & Quick Actions -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative flex-1 sm:flex-none min-w-[210px]">
+            <select id="assessment-switcher" aria-label="Switch Assessment"
+              class="w-full appearance-none bg-white border border-warmborder rounded-xl pl-3 pr-9 py-2 text-sm font-medium text-ink shadow-sm focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest cursor-pointer">
+              <option value="">No assessments loaded</option>
+            </select>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-ink-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          </div>
+
+          <button id="btn-load-demo" type="button"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium bg-white border border-warmborder text-ink hover:bg-forest-light hover:border-forest/30 hover:text-forest transition shadow-sm">
+            <i data-lucide="sparkles" class="w-4 h-4 text-redpen"></i>
+            <span>Load Demo Batch</span>
+          </button>
+
+          <button id="btn-new-assessment" type="button"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium bg-forest text-white hover:bg-forest-hover transition shadow-sm">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>New Batch</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-0 -mb-px scrollbar-none" aria-label="Main Tabs">
+        <button data-tab="upload" class="tab-btn active whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+          <span>Upload &amp; Grade</span>
+        </button>
+        <button data-tab="principal" class="tab-btn whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Principal Findings</span>
+        </button>
+        <button data-tab="psychometrics" class="tab-btn whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>Psychometrics &amp; Bellwethers</span>
+        </button>
+        <button data-tab="students" class="tab-btn whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Students</span>
+          <span id="nav-student-count" class="ml-0.5 px-1.5 py-0.2 rounded-full text-[11px] bg-warmborder/70 text-ink hidden">0</span>
+        </button>
+        <button data-tab="revisions" class="tab-btn whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="wrench" class="w-4 h-4"></i>
+          <span>Test Revisions</span>
+        </button>
+        <button data-tab="progress" class="tab-btn whitespace-nowrap px-3.5 py-2.5 text-sm text-ink-muted hover:text-forest flex items-center gap-1.5">
+          <i data-lucide="trending-up" class="w-4 h-4"></i>
+          <span>Progress Tracker</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ==================== TAB 1: UPLOAD & GRADE ==================== -->
+    <section id="tab-upload" class="tab-panel space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left Column: Assessment Details & Answer Key -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="font-serif text-xl font-bold text-ink">Assessment Setup</h2>
+              <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-forest-light text-forest">Batch Mode</span>
+            </div>
+
+            <div>
+              <label for="input-assessment-name" class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1.5">Assessment Name</label>
+              <input id="input-assessment-name" type="text" placeholder="e.g., Check-In #7: Equations & Terms"
+                class="w-full rounded-xl border border-warmborder bg-[#FCFBF8] px-3.5 py-2.5 text-sm text-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="input-class-section" class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1.5">Class / Section</label>
+                <input id="input-class-section" type="text" placeholder="e.g., Math 7C"
+                  class="w-full rounded-xl border border-warmborder bg-[#FCFBF8] px-3.5 py-2.5 text-sm text-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest" />
+              </div>
+              <div>
+                <label for="input-assessment-date" class="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-1.5">Date Given</label>
+                <input id="input-assessment-date" type="date"
+                  class="w-full rounded-xl border border-warmborder bg-[#FCFBF8] px-3.5 py-2.5 text-sm text-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest" />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="input-answer-key" class="block text-xs font-semibold uppercase tracking-wider text-ink-muted">Answer Key / Rubric <span class="font-normal normal-case text-ink-subtle">(optional)</span></label>
+              </div>
+              <textarea id="input-answer-key" rows="5"
+                placeholder="1. Variable: a, Coefficient: 5, Constant: 2&#10;2. 5 terms&#10;3. p = 9&#10;4. k = 85&#10;5. v = 7&#10;6. h = 3.76"
+                class="w-full rounded-xl border border-warmborder bg-[#FCFBF8] px-3.5 py-2.5 text-sm text-ink font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest"></textarea>
+              <p class="mt-1.5 text-xs text-ink-muted flex items-center gap-1.5">
+                <i data-lucide="wand-2" class="w-3.5 h-3.5 text-forest shrink-0"></i>
+                Leave blank and Math Grandma solves each problem automatically.
+              </p>
+            </div>
+          </div>
+
+          <!-- Helpful Callout Card -->
+          <div class="bg-[#F5F1E8] rounded-2xl border border-warmborder p-5 space-y-2.5">
+            <h3 class="font-serif text-base font-bold text-ink flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-forest"></i>
+              How Batch Auto-Separation Works
+            </h3>
+            <ul class="text-xs text-ink-muted space-y-1.5 list-disc pl-4 leading-relaxed">
+              <li>Drop an <strong>entire class stack</strong> of JPEGs, PNGs, or multi-page scanned PDFs at once.</li>
+              <li>Math Grandma reads handwritten student names, groups multi-page tests automatically, and flags separate extra-credit sheets.</li>
+              <li>Every question is graded, transcribed in handwriting style, and fed into the live Psychometric &amp; Bellwether engine.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right Column: Batch Upload Dropzone & Queued Pages -->
+        <div class="lg:col-span-7 space-y-5">
+          <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="font-serif text-xl font-bold text-ink">Class Stack Upload</h2>
+                <p class="text-xs text-ink-muted mt-0.5">Upload JPEGs, PNGs, WebP, or multi-page PDFs of student quizzes &amp; tests.</p>
+              </div>
+              <button id="btn-clear-queue" type="button" class="hidden text-xs font-medium text-redpen hover:underline flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                Clear Queue
+              </button>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div id="dropzone"
+              class="border-2 border-dashed border-[#D3CCB9] rounded-2xl bg-[#FCFBF8] p-7 sm:p-9 text-center cursor-pointer transition-all hover:border-forest/60 hover:bg-forest-light/30">
+              <input id="file-input" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" class="hidden" />
+              <div class="w-12 h-12 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-3">
+                <i data-lucide="file-up" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-semibold text-ink">Drop your class test stack here, or <span class="text-forest underline">browse files</span></p>
+              <p class="text-xs text-ink-muted mt-1">Supports batch JPG, PNG, WebP, and multi-page PDF scans</p>
+            </div>
+
+            <!-- PDF Conversion Spinner -->
+            <div id="pdf-loading-bar" class="hidden items-center gap-3 p-3.5 rounded-xl bg-forest-light/70 border border-forest/20 text-sm text-forest">
+              <div class="w-4 h-4 border-2 border-forest border-t-transparent rounded-full animate-spin shrink-0"></div>
+              <span id="pdf-loading-text" class="font-medium">Rendering PDF pages...</span>
+            </div>
+
+            <!-- Thumbnail Grid of Queued Pages -->
+            <div id="queue-section" class="hidden space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                  Queued Test Pages (<span id="queue-count">0</span>)
+                </h3>
+                <span class="text-xs text-ink-subtle">Click × to remove any stray page</span>
+              </div>
+              <div id="page-thumbnail-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[360px] overflow-y-auto pr-1">
+                <!-- Thumbnails rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Multi-Step Grading Progress Indicator -->
+            <div id="grading-progress-panel" class="hidden rounded-2xl border border-forest/25 bg-forest-light/40 p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 border-2 border-forest border-t-transparent rounded-full animate-spin"></div>
+                  <h3 class="font-serif font-bold text-forest text-base">Math Grandma is grading your stack...</h3>
+                </div>
+                <span id="grading-progress-pct" class="text-xs font-bold text-forest">15%</span>
+              </div>
+              <div class="w-full h-2 bg-white rounded-full overflow-hidden border border-forest/15">
+                <div id="grading-progress-bar" class="h-full bg-forest transition-all duration-500 rounded-full" style="width: 15%"></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div id="step-1" class="flex items-center gap-2 text-forest font-medium">
+                  <span class="w-2 h-2 rounded-full bg-forest"></span> 1. Preparing &amp; optimizing scanned pages
+                </div>
+                <div id="step-2" class="flex items-center gap-2 text-ink-subtle">
+                  <span class="w-2 h-2 rounded-full bg-warmborder"></span> 2. Reading handwriting &amp; identifying students
+                </div>
+                <div id="step-3" class="flex items-center gap-2 text-ink-subtle">
+                  <span class="w-2 h-2 rounded-full bg-warmborder"></span> 3. Computing psychometric &amp; bellwether indices
+                </div>
+                <div id="step-4" class="flex items-center gap-2 text-ink-subtle">
+                  <span class="w-2 h-2 rounded-full bg-warmborder"></span> 4. Drafting Principal Findings &amp; revisions
+                </div>
+              </div>
+            </div>
+
+            <!-- Primary Grade Action -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <button id="btn-grade-batch" type="button" disabled
+                class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-semibold bg-forest text-white hover:bg-forest-hover disabled:opacity-45 disabled:cursor-not-allowed transition shadow-sm">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                <span>Grade Batch &amp; Generate Reports</span>
+              </button>
+              <button id="btn-demo-inline" type="button"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-sm font-medium bg-[#F5F1E8] text-ink hover:bg-[#EBE5D8] border border-warmborder transition">
+                <i data-lucide="sparkles" class="w-4 h-4 text-redpen"></i>
+                <span>Try Demo Class (10 Students)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: PRINCIPAL FINDINGS ==================== -->
+    <section id="tab-principal" class="tab-panel hidden space-y-6">
+      <div id="principal-empty" class="bg-card rounded-2xl border border-warmborder p-12 text-center shadow-editorial">
+        <div class="w-14 h-14 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="file-text" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-serif text-2xl font-bold text-ink">No Assessment Selected Yet</h2>
+        <p class="text-sm text-ink-muted max-w-md mx-auto mt-2">Upload a batch of student quizzes or click <strong>Load Demo Batch</strong> to generate an executive Principal Findings brief.</p>
+      </div>
+
+      <div id="principal-content" class="hidden space-y-6">
+        <!-- Action Bar (Hidden in Print) -->
+        <div class="no-print flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-ink">Principal Findings</h2>
+            <p class="text-xs text-ink-muted">Executive-level diagnostic brief formatted for administrative review.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-toggle-edit-summary" type="button"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium bg-white border border-warmborder text-ink hover:bg-[#F5F1E8] transition shadow-sm">
+              <i data-lucide="pencil" class="w-4 h-4 text-forest"></i>
+              <span id="edit-summary-label">Edit Narrative</span>
+            </button>
+            <button id="btn-print-principal" type="button"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-forest text-white hover:bg-forest-hover transition shadow-sm">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>Print / Save as PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Formal Executive Memo Document -->
+        <article id="principal-memo-container" class="bg-card rounded-2xl border border-warmborder shadow-paper p-6 sm:p-10 space-y-8">
+          <!-- Memo Header -->
+          <div class="border-b-2 border-forest pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-forest">
+                <span>Executive Assessment Memorandum</span>
+                <span>•</span>
+                <span>Math Grandma Diagnostics</span>
+              </div>
+              <h1 id="memo-title" class="font-serif text-3xl font-bold text-ink">Check-In #7: Equations &amp; Terms</h1>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-1.5 pt-2 text-xs text-ink-muted">
+                <div><span class="font-semibold text-ink">TO:</span> Principal</div>
+                <div><span class="font-semibold text-ink">CLASS:</span> <span id="memo-class">—</span></div>
+                <div><span class="font-semibold text-ink">DATE:</span> <span id="memo-date">—</span></div>
+                <div><span class="font-semibold text-ink">ASSESSED:</span> <span id="memo-count">—</span></div>
+              </div>
+            </div>
+            <!-- Red-pen Class Score Circle -->
+            <div class="shrink-0 self-start sm:self-end">
+              <div class="relative inline-flex flex-col items-center justify-center px-6 py-3">
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 160 80" preserveAspectRatio="none">
+                  <path d="M 14 42 C 12 14, 142 6, 148 36 C 154 66, 22 76, 10 46 C 8 38, 16 26, 30 18"
+                    fill="none" stroke="#B91C1C" stroke-width="2.5" stroke-linecap="round" opacity="0.88" />
+                </svg>
+                <span id="memo-red-score" class="font-hand text-3xl font-bold text-redpen leading-none">80%</span>
+                <span id="memo-red-sub" class="font-hand text-sm font-semibold text-redpen/90 leading-tight">Class Mean</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5 Executive KPI Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 print-break-avoid">
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Class Average</p>
+              <p id="kpi-avg" class="font-serif text-2xl font-bold text-ink mt-1">—</p>
+              <p id="kpi-avg-sub" class="text-xs text-ink-subtle mt-0.5">—</p>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Median Score</p>
+              <p id="kpi-median" class="font-serif text-2xl font-bold text-ink mt-1">—</p>
+              <p class="text-xs text-ink-subtle mt-0.5">50th percentile</p>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Mastery Rate</p>
+              <p id="kpi-mastery" class="font-serif text-2xl font-bold text-forest mt-1">—</p>
+              <p class="text-xs text-ink-subtle mt-0.5">Scoring ≥ 80%</p>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Test Discrimination</p>
+              <p id="kpi-disc" class="font-serif text-2xl font-bold text-ink mt-1">—</p>
+              <p id="kpi-disc-sub" class="text-xs text-ink-subtle mt-0.5">Mean D Index</p>
+            </div>
+            <div class="col-span-2 lg:col-span-1 rounded-xl border border-forest/30 bg-forest-light/50 p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-forest">Top Bellwether</p>
+              <p id="kpi-bellwether" class="font-serif text-2xl font-bold text-forest mt-1">—</p>
+              <p id="kpi-bellwether-sub" class="text-xs text-forest/80 mt-0.5 truncate">—</p>
+            </div>
+          </div>
+
+          <!-- Executive Summary & Mastery Snapshot -->
+          <div class="space-y-3 print-break-avoid">
+            <h3 class="font-serif text-xl font-bold text-ink flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded-full bg-forest inline-block"></span>
+              Executive Summary &amp; Mastery Snapshot
+            </h3>
+            <p id="memo-summary-display" class="text-sm leading-relaxed text-ink/90 whitespace-pre-line"></p>
+            <div id="memo-summary-editor" class="hidden space-y-2">
+              <textarea id="memo-summary-textarea" rows="5"
+                class="w-full rounded-xl border border-forest/40 bg-[#FCFBF8] p-3.5 text-sm leading-relaxed text-ink focus:outline-none focus:ring-2 focus:ring-forest/30"></textarea>
+              <div class="flex justify-end gap-2">
+                <button id="btn-cancel-summary" type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-ink-muted hover:bg-warmborder/40">Cancel</button>
+                <button id="btn-save-summary" type="button" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-forest text-white hover:bg-forest-hover">Save Narrative</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bellwether Predictors Callout -->
+          <div class="rounded-2xl border border-forest/25 bg-forest-light/40 p-5 sm:p-6 space-y-3 print-break-avoid">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-serif text-lg font-bold text-forest flex items-center gap-2">
+                <i data-lucide="compass" class="w-5 h-5"></i>
+                Bellwether Predictors of High Mastery
+              </h3>
+              <span class="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-forest text-white">Psychometric Signal</span>
+            </div>
+            <div id="memo-bellwether-list" class="space-y-3 text-sm text-ink">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Tiered Student Performance Breakdown -->
+          <div class="space-y-3 print-break-avoid">
+            <h3 class="font-serif text-xl font-bold text-ink flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded-full bg-forest inline-block"></span>
+              Tiered Student Performance Breakdown
+            </h3>
+            <div id="memo-tiers-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Top Instructional Reteach Priorities -->
+          <div class="space-y-3 print-break-avoid">
+            <h3 class="font-serif text-xl font-bold text-ink flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded-full bg-redpen inline-block"></span>
+              Top Instructional Reteach Priorities
+            </h3>
+            <div id="memo-priorities-list" class="space-y-3">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: PSYCHOMETRICS & BELLWETHERS ==================== -->
+    <section id="tab-psychometrics" class="tab-panel hidden space-y-6">
+      <div id="psychometrics-empty" class="bg-card rounded-2xl border border-warmborder p-12 text-center shadow-editorial">
+        <div class="w-14 h-14 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="activity" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-serif text-2xl font-bold text-ink">Psychometric Engine Ready</h2>
+        <p class="text-sm text-ink-muted max-w-md mx-auto mt-2">Grade a batch or load the demo class to view Discrimination Indices ($D$), Point-Biserial correlations ($r_{pb}$), and Bellwether predictors.</p>
+      </div>
+
+      <div id="psychometrics-content" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-ink">Psychometrics &amp; Bellwether Analysis</h2>
+            <p class="text-xs text-ink-muted">Live Classical Test Theory metrics recalculated automatically whenever any student score changes.</p>
+          </div>
+          <div class="text-xs text-ink-muted bg-white border border-warmborder px-3 py-1.5 rounded-xl">
+            Upper / Lower Group Split: <strong id="psy-split-label" class="text-ink">Top 3 vs. Bottom 3</strong>
+          </div>
+        </div>
+
+        <!-- Bellwether Spotlight Cards -->
+        <div id="bellwether-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Psychometric Quadrant Scatter Plot -->
+          <div class="lg:col-span-7 bg-card rounded-2xl border border-warmborder shadow-editorial p-5">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="font-serif text-lg font-bold text-ink">Psychometric Quadrant: Difficulty vs. Discrimination</h3>
+                <p class="text-xs text-ink-muted">Shaded green box marks the <strong>Bellwether Sweet Spot</strong> (p: 25%–85%, D ≥ 0.35).</p>
+              </div>
+            </div>
+            <div class="relative h-[300px] w-full">
+              <canvas id="chart-quadrant"></canvas>
+            </div>
+          </div>
+
+          <!-- Score Distribution Histogram -->
+          <div class="lg:col-span-5 bg-card rounded-2xl border border-warmborder shadow-editorial p-5">
+            <div class="mb-3">
+              <h3 class="font-serif text-lg font-bold text-ink">Class Score Distribution</h3>
+              <p class="text-xs text-ink-muted">Student count by percentage bracket.</p>
+            </div>
+            <div class="relative h-[300px] w-full">
+              <canvas id="chart-histogram"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Mastery & Discrimination Bar Chart -->
+        <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-5">
+          <div class="mb-3">
+            <h3 class="font-serif text-lg font-bold text-ink">Question Mastery (% Correct) vs. Discrimination Index (D)</h3>
+            <p class="text-xs text-ink-muted">Compare overall pass rate against how strongly each question separates top performers from struggling students.</p>
+          </div>
+          <div class="relative h-[260px] w-full">
+            <canvas id="chart-bar-mastery"></canvas>
+          </div>
+        </div>
+
+        <!-- Full Item Analysis Table -->
+        <div class="bg-card rounded-2xl border border-warmborder shadow-editorial overflow-hidden">
+          <div class="p-5 border-b border-warmborder flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="font-serif text-lg font-bold text-ink">Full Item Analysis Matrix</h3>
+              <p class="text-xs text-ink-muted">Classical Test Theory diagnostics across all regular test questions.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-[#FAF8F3] border-b border-warmborder text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+                  <th class="py-3 px-4">Item</th>
+                  <th class="py-3 px-4">Skill / Topic</th>
+                  <th class="py-3 px-4 text-right">% Correct (p)</th>
+                  <th class="py-3 px-4 text-right">Upper Grp %</th>
+                  <th class="py-3 px-4 text-right">Lower Grp %</th>
+                  <th class="py-3 px-4 text-right">Discrim. (D)</th>
+                  <th class="py-3 px-4 text-right">Point-Bis. (r<sub>pb</sub>)</th>
+                  <th class="py-3 px-4">Health / Bellwether Status</th>
+                </tr>
+              </thead>
+              <tbody id="item-analysis-tbody" class="divide-y divide-warmborder/70">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: STUDENTS & GRADEBOOK ==================== -->
+    <section id="tab-students" class="tab-panel hidden space-y-6">
+      <div id="students-empty" class="bg-card rounded-2xl border border-warmborder p-12 text-center shadow-editorial">
+        <div class="w-14 h-14 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="users" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-serif text-2xl font-bold text-ink">No Student Reports Yet</h2>
+        <p class="text-sm text-ink-muted max-w-md mx-auto mt-2">Upload student tests or load the demo batch to inspect individual handwritten work and override scores.</p>
+      </div>
+
+      <div id="students-content" class="hidden space-y-5">
+        <!-- Toolbar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-ink">Student Reports &amp; Interactive Gradebook</h2>
+            <p class="text-xs text-ink-muted">Organized individually by student name. Click any student to inspect handwriting &amp; adjust scores.</p>
+          </div>
+          <button id="btn-export-csv" type="button"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-white border border-warmborder text-ink hover:bg-forest-light hover:text-forest hover:border-forest/30 transition shadow-sm">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Download CSV Gradebook</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left Sidebar: Searchable, Sortable Student Roster -->
+          <div class="lg:col-span-4 bg-card rounded-2xl border border-warmborder shadow-editorial overflow-hidden">
+            <div class="p-4 border-b border-warmborder space-y-2.5 bg-[#FAF8F3]">
+              <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 text-ink-subtle absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input id="student-search" type="text" placeholder="Search student name..."
+                  class="w-full rounded-xl border border-warmborder bg-white pl-9 pr-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/30" />
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs text-ink-muted">Sort by:</span>
+                <select id="student-sort" class="rounded-lg border border-warmborder bg-white px-2.5 py-1 text-xs font-medium text-ink focus:outline-none">
+                  <option value="name">Name (A–Z)</option>
+                  <option value="score-desc">Score (High → Low)</option>
+                  <option value="score-asc">Score (Low → High)</option>
+                </select>
+              </div>
+            </div>
+            <div id="student-roster-list" class="divide-y divide-warmborder/70 max-h-[680px] overflow-y-auto">
+              <!-- Student list items -->
+            </div>
+          </div>
+
+          <!-- Right Detail Pane: Individual Student Report -->
+          <div id="student-detail-pane" class="lg:col-span-8 bg-card rounded-2xl border border-warmborder shadow-editorial p-5 sm:p-7 space-y-6">
+            <!-- Populated dynamically when a student is selected -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: TEST REVISIONS ==================== -->
+    <section id="tab-revisions" class="tab-panel hidden space-y-6">
+      <div id="revisions-empty" class="bg-card rounded-2xl border border-warmborder p-12 text-center shadow-editorial">
+        <div class="w-14 h-14 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="wrench" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-serif text-2xl font-bold text-ink">Future Test Revision Studio</h2>
+        <p class="text-sm text-ink-muted max-w-md mx-auto mt-2">Grade an assessment first to receive psychometric and AI-powered recommendations for strengthening future versions of this test.</p>
+      </div>
+
+      <div id="revisions-content" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-ink">Future Test Revision Recommendations</h2>
+            <p class="text-xs text-ink-muted">Actionable rewrites combining live Discrimination Index diagnostics with pedagogical design.</p>
+          </div>
+          <button id="btn-refresh-revisions" type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-forest text-white hover:bg-forest-hover transition shadow-sm">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>Refresh AI Revisions</span>
+          </button>
+        </div>
+
+        <!-- Revisions Loading State -->
+        <div id="revisions-loading" class="hidden items-center gap-3 p-4 rounded-xl bg-forest-light border border-forest/20 text-sm text-forest">
+          <div class="w-4 h-4 border-2 border-forest border-t-transparent rounded-full animate-spin"></div>
+          <span>Consulting Math Grandma AI with your latest psychometric scores...</span>
+        </div>
+
+        <!-- Questions to Revise -->
+        <div class="space-y-3">
+          <h3 class="font-serif text-lg font-bold text-ink flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-redpen"></span>
+            Specific Question Rewrites (Low Discrimination / Floor / Ceiling)
+          </h3>
+          <div id="revisions-rewrites-list" class="space-y-4">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Anchor Bellwethers to Preserve -->
+        <div class="space-y-3">
+          <h3 class="font-serif text-lg font-bold text-ink flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-forest"></span>
+            Bellwether Anchor Questions to Preserve
+          </h3>
+          <div id="revisions-anchors-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Structural Recommendations -->
+        <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-6 space-y-3">
+          <h3 class="font-serif text-lg font-bold text-ink flex items-center gap-2">
+            <i data-lucide="layout-list" class="w-5 h-5 text-forest"></i>
+            Structural &amp; Rubric Enhancements for Next Year
+          </h3>
+          <div id="revisions-structural-list" class="space-y-2.5 text-sm text-ink">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: PROGRESS TRACKER ==================== -->
+    <section id="tab-progress" class="tab-panel hidden space-y-6">
+      <div id="progress-empty" class="bg-card rounded-2xl border border-warmborder p-12 text-center shadow-editorial">
+        <div class="w-14 h-14 rounded-2xl bg-forest-light text-forest mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="trending-up" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-serif text-2xl font-bold text-ink">Longitudinal Progress Tracker</h2>
+        <p class="text-sm text-ink-muted max-w-md mx-auto mt-2">Save multiple assessments (or load the Demo Batch with 3 term check-ins) to track class and student growth over time.</p>
+      </div>
+
+      <div id="progress-content" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <h2 class="font-serif text-2xl font-bold text-ink">Longitudinal Progress Tracker</h2>
+            <p class="text-xs text-ink-muted">Track class mastery trends, individual student trajectories, and recurring error patterns across assessments.</p>
+          </div>
+        </div>
+
+        <!-- Class Trend Chart + Saved Assessments Manager -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 bg-card rounded-2xl border border-warmborder shadow-editorial p-5">
+            <h3 class="font-serif text-lg font-bold text-ink">Class Mean &amp; Mastery Trend Over Time</h3>
+            <p class="text-xs text-ink-muted mb-3">Chronological progression across all saved assessments.</p>
+            <div class="relative h-[270px] w-full">
+              <canvas id="chart-class-trend"></canvas>
+            </div>
+          </div>
+
+          <!-- Saved Assessments List -->
+          <div class="lg:col-span-4 bg-card rounded-2xl border border-warmborder shadow-editorial p-5 flex flex-col">
+            <h3 class="font-serif text-lg font-bold text-ink mb-1">Saved Assessments</h3>
+            <p class="text-xs text-ink-muted mb-3">Click to open or remove from term record.</p>
+            <div id="saved-assessments-list" class="space-y-2 overflow-y-auto max-h-[260px] pr-1 flex-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Individual Student Trajectory -->
+        <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-5 sm:p-6 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-warmborder pb-4">
+            <div>
+              <h3 class="font-serif text-xl font-bold text-ink">Individual Student Trajectory</h3>
+              <p class="text-xs text-ink-muted">Select a student to inspect their growth curve and recurring math error patterns.</p>
+            </div>
+            <div class="min-w-[220px]">
+              <select id="progress-student-selector"
+                class="w-full rounded-xl border border-warmborder bg-[#FAF8F3] px-3.5 py-2 text-sm font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-forest/30">
+              </select>
+            </div>
+          </div>
+
+          <!-- Student Longitudinal KPIs -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Term Average</p>
+              <p id="prog-stu-avg" class="font-serif text-2xl font-bold text-ink mt-1">—</p>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Latest Assessment</p>
+              <p id="prog-stu-latest" class="font-serif text-2xl font-bold text-ink mt-1">—</p>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Growth Trend</p>
+              <div id="prog-stu-trend" class="mt-1.5">—</div>
+            </div>
+            <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">Top Recurring Error</p>
+              <p id="prog-stu-error" class="font-semibold text-sm text-redpen mt-2 capitalize">—</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">Score Progression</h4>
+              <div class="relative h-[240px] w-full">
+                <canvas id="chart-student-trend"></canvas>
+              </div>
+            </div>
+            <div class="lg:col-span-5 space-y-4">
+              <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">Error Type Frequency Across Tests</h4>
+                <div id="prog-error-bars" class="space-y-2">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">Assessment History</h4>
+                <div class="border border-warmborder rounded-xl overflow-hidden">
+                  <table class="w-full text-xs text-left">
+                    <thead class="bg-[#FAF8F3] border-b border-warmborder text-ink-muted">
+                      <tr>
+                        <th class="py-2 px-3">Date</th>
+                        <th class="py-2 px-3">Assessment</th>
+                        <th class="py-2 px-3 text-right">Score</th>
+                      </tr>
+                    </thead>
+                    <tbody id="prog-history-tbody" class="divide-y divide-warmborder/60"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== CUSTOM MODAL (No Browser alert/confirm) ==================== -->
+  <div id="modal-backdrop" class="no-print fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-card rounded-2xl border border-warmborder shadow-xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-redpen-light text-redpen flex items-center justify-center shrink-0">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 id="modal-title" class="font-serif text-lg font-bold text-ink">Confirm Action</h3>
+          <p id="modal-message" class="text-sm text-ink-muted mt-1"></p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="modal-cancel" type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-ink-muted hover:bg-[#F5F1E8]">Cancel</button>
+        <button id="modal-confirm" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold bg-redpen text-white hover:bg-red-800">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="no-print fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+
+  <!-- ==================== APPLICATION SCRIPT (ESM + FIREBASE + GEMINI) ==================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // =========================================================================
+    // 1. CONFIGURATION & GLOBAL STATE
+    // =========================================================================
+    const apiKey = ""; // Provided at runtime by environment
+    const GEMINI_MODEL = "gemini-3-flash-preview";
+
+    // Configure PDF.js worker
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
+    const state = {
+      activeTab: "upload",
+      queuedPages: [], // { id, name, pageNum, dataUrl, mimeType }
+      assessments: [], // Array of Assessment objects sorted by date desc
+      currentAssessmentId: null,
+      selectedStudentId: null,
+      studentSearch: "",
+      studentSort: "name",
+      progressStudentName: null,
+      charts: {
+        quadrant: null,
+        histogram: null,
+        barMastery: null,
+        classTrend: null,
+        studentTrend: null
+      }
+    };
+
+    // Firebase Handles
+    let db = null;
+    let auth = null;
+    let currentUser = null;
+    let unsubscribeAssessments = null;
+    const appId = typeof __app_id !== "undefined" ? __app_id : "math-grandma-default";
+
+    // =========================================================================
+    // 2. UTILITY FUNCTIONS (TOASTS, MODALS, FORMATTING, EXPONENTIAL BACKOFF)
+    // =========================================================================
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const el = document.createElement("div");
+      const styles = {
+        success: "bg-forest text-white border-forest",
+        error: "bg-redpen text-white border-redpen",
+        info: "bg-ink text-white border-ink"
+      };
+      el.className = `px-4 py-3 rounded-xl shadow-lg border text-sm font-medium flex items-center gap-2.5 transition-all duration-300 translate-y-2 opacity-0 ${styles[type] || styles.info}`;
+      el.innerHTML = `<span>${escapeHtml(message)}</span>`;
+      container.appendChild(el);
+      requestAnimationFrame(() => {
+        el.classList.remove("translate-y-2", "opacity-0");
+      });
+      setTimeout(() => {
+        el.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => el.remove(), 300);
+      }, 3600);
+    }
+
+    let modalConfirmCallback = null;
+    function openConfirmModal(title, message, onConfirm) {
+      document.getElementById("modal-title").textContent = title;
+      document.getElementById("modal-message").textContent = message;
+      modalConfirmCallback = onConfirm;
+      const backdrop = document.getElementById("modal-backdrop");
+      backdrop.classList.remove("hidden");
+      backdrop.classList.add("flex");
+    }
+
+    function closeConfirmModal() {
+      const backdrop = document.getElementById("modal-backdrop");
+      backdrop.classList.add("hidden");
+      backdrop.classList.remove("flex");
+      modalConfirmCallback = null;
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatPct(val) {
+      return `${Math.round((val || 0) * 100)}%`;
+    }
+
+    function formatDec(val) {
+      const n = Number(val || 0);
+      return (n >= 0 ? "+" : "") + n.toFixed(2);
+    }
+
+    function todayISO() {
+      const d = new Date();
+      return d.toISOString().split("T")[0];
+    }
+
+    function generateId(prefix = "id") {
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    /**
+     * Fetch wrapper with exponential backoff (1s, 2s, 4s, 8s) for Gemini API reliability.
+     */
+    async function fetchWithBackoff(url, options, maxRetries = 4) {
+      let delay = 1000;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const res = await fetch(url, options);
+          if (res.ok) return res;
+          if (res.status === 429 || res.status >= 500) {
+            if (attempt === maxRetries) {
+              const errText = await res.text().catch(() => "");
+              throw new Error(`API error ${res.status}: ${errText}`);
+            }
+          } else {
+            const errText = await res.text().catch(() => "");
+            throw new Error(`API error ${res.status}: ${errText}`);
+          }
+        } catch (err) {
+          if (attempt === maxRetries) throw err;
+        }
+        await new Promise((r) => setTimeout(r, delay));
+        delay *= 2;
+      }
+    }
+
+    // =========================================================================
+    // 3. FIREBASE INITIALIZATION & PERSISTENCE (STRICT RULES 1, 2, 3)
+    // =========================================================================
+    async function initFirebase() {
+      const badge = document.getElementById("cloud-status-badge");
+      const statusText = document.getElementById("cloud-status-text");
+
+      try {
+        if (typeof __firebase_config === "undefined" || !__firebase_config) {
+          // Graceful local-memory fallback if running outside cloud workspace
+          badge.classList.remove("hidden");
+          statusText.textContent = "Session Mode";
+          return;
+        }
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        // RULE 3: Authenticate FIRST before any Firestore queries
+        if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        onAuthStateChanged(auth, (user) => {
+          currentUser = user;
+          if (user) {
+            badge.classList.remove("hidden");
+            statusText.textContent = "Cloud Synced";
+            subscribeToAssessments(user.uid);
+          }
+        });
+      } catch (err) {
+        console.error("Firebase init notice:", err);
+        badge.classList.remove("hidden");
+        statusText.textContent = "Session Mode";
+      }
+    }
+
+    function subscribeToAssessments(userId) {
+      if (!db || !userId) return;
+      if (unsubscribeAssessments) unsubscribeAssessments();
+
+      // RULE 1 & RULE 2: Strict user private path, simple collection query (sort in JS memory)
+      const colRef = collection(db, "artifacts", appId, "users", userId, "assessments");
+      unsubscribeAssessments = onSnapshot(
+        colRef,
+        (snapshot) => {
+          const loaded = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data && data.id) {
+              loaded.push(data);
+            }
+          });
+          // Sort chronologically newest first in JS memory
+          loaded.sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.createdAt || 0) - (a.createdAt || 0));
+          state.assessments = loaded;
+
+          if (!state.currentAssessmentId && loaded.length > 0) {
+            state.currentAssessmentId = loaded[0].id;
+          } else if (state.currentAssessmentId && !loaded.find((a) => a.id === state.currentAssessmentId)) {
+            state.currentAssessmentId = loaded.length > 0 ? loaded[0].id : null;
+          }
+          renderAll();
+        },
+        (error) => {
+          console.error("Firestore subscription error:", error);
+          showToast("Cloud sync paused — working in local session.", "info");
+        }
+      );
+    }
+
+    async function saveAssessment(assessment) {
+      // Update local state immediately for snappy UX
+      const idx = state.assessments.findIndex((a) => a.id === assessment.id);
+      if (idx >= 0) {
+        state.assessments[idx] = assessment;
+      } else {
+        state.assessments.unshift(assessment);
+      }
+      state.assessments.sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.createdAt || 0) - (a.createdAt || 0));
+      state.currentAssessmentId = assessment.id;
+
+      // Persist to Firestore if authenticated
+      if (db && currentUser) {
+        try {
+          const docRef = doc(db, "artifacts", appId, "users", currentUser.uid, "assessments", assessment.id);
+          // Sanitize undefined values
+          const clean = JSON.parse(JSON.stringify(assessment));
+          await setDoc(docRef, clean);
+        } catch (err) {
+          console.error("Error saving to Firestore:", err);
+          showToast("Saved locally (cloud sync encountered an error).", "error");
+        }
+      }
+    }
+
+    async function deleteAssessmentById(assessmentId) {
+      state.assessments = state.assessments.filter((a) => a.id !== assessmentId);
+      if (state.currentAssessmentId === assessmentId) {
+        state.currentAssessmentId = state.assessments.length > 0 ? state.assessments[0].id : null;
+        state.selectedStudentId = null;
+      }
+      renderAll();
+
+      if (db && currentUser) {
+        try {
+          const docRef = doc(db, "artifacts", appId, "users", currentUser.uid, "assessments", assessmentId);
+          await deleteDoc(docRef);
+        } catch (err) {
+          console.error("Error deleting assessment:", err);
+        }
+      }
+      showToast("Assessment deleted.", "info");
+    }
+
+    function getCurrentAssessment() {
+      return state.assessments.find((a) => a.id === state.currentAssessmentId) || null;
+    }
+
+    // =========================================================================
+    // 4. PSYCHOMETRIC ENGINE (CLASSICAL TEST THEORY & BELLWETHER DETECTION)
+    // =========================================================================
+    /**
+     * Dynamically calculates all psychometric metrics from the student × question matrix.
+     * Supports 1 (Correct), 0.5 (Partial), and 0 (Incorrect).
+     */
+    function computePsychometrics(assessment) {
+      if (!assessment || !assessment.questions || !assessment.students || assessment.students.length === 0) {
+        return null;
+      }
+
+      const regularQuestions = assessment.questions.filter((q) => !q.isExtraCredit);
+      const qCount = regularQuestions.length;
+      const students = assessment.students;
+      const n = students.length;
+
+      // 1. Compute each student's regular score & percentage
+      const studentTotals = students.map((stu) => {
+        let earned = 0;
+        regularQuestions.forEach((q) => {
+          const resp = (stu.responses || []).find((r) => r.questionId === q.id);
+          earned += resp ? Number(resp.score || 0) : 0;
+        });
+        const pct = qCount > 0 ? earned / qCount : 0;
+        return { studentId: stu.id, name: stu.name, earned, max: qCount, pct };
+      });
+
+      // Summary stats
+      const pcts = studentTotals.map((s) => s.pct).sort((a, b) => a - b);
+      const meanPct = pcts.reduce((sum, v) => sum + v, 0) / n;
+      const medianPct = n % 2 === 1 ? pcts[Math.floor(n / 2)] : (pcts[n / 2 - 1] + pcts[n / 2]) / 2;
+      const masteryCount = studentTotals.filter((s) => s.pct >= 0.8).length;
+      const masteryRate = masteryCount / n;
+
+      // 2. Upper (~33%) & Lower (~33%) groups for Discrimination Index (D)
+      const sortedByScore = [...studentTotals].sort((a, b) => b.pct - a.pct);
+      const groupSize = Math.max(1, Math.round(n / 3));
+      const upperIds = new Set(sortedByScore.slice(0, groupSize).map((s) => s.studentId));
+      const lowerIds = new Set(sortedByScore.slice(n - groupSize).map((s) => s.studentId));
+
+      // Helper for Pearson correlation (Point-Biserial r_pb)
+      const meanTotal = studentTotals.reduce((acc, s) => acc + s.earned, 0) / n;
+      const varTotal = studentTotals.reduce((acc, s) => acc + Math.pow(s.earned - meanTotal, 2), 0);
+
+      // 3. Per-Question Metrics
+      const items = regularQuestions.map((q) => {
+        const scores = students.map((stu) => {
+          const resp = (stu.responses || []).find((r) => r.questionId === q.id);
+          return resp ? Number(resp.score || 0) : 0;
+        });
+
+        // Difficulty Index (p-value)
+        const p = scores.reduce((a, b) => a + b, 0) / n;
+
+        // Upper & Lower group rates
+        let upperSum = 0;
+        let lowerSum = 0;
+        students.forEach((stu, idx) => {
+          if (upperIds.has(stu.id)) upperSum += scores[idx];
+          if (lowerIds.has(stu.id)) lowerSum += scores[idx];
+        });
+        const upperPct = upperSum / groupSize;
+        const lowerPct = lowerSum / groupSize;
+        const D = upperPct - lowerPct;
+
+        // Point-Biserial Correlation (r_pb) with total score
+        const meanItem = p;
+        let cov = 0;
+        let varItem = 0;
+        for (let i = 0; i < n; i++) {
+          const di = scores[i] - meanItem;
+          const dt = studentTotals[i].earned - meanTotal;
+          cov += di * dt;
+          varItem += di * di;
+        }
+        const rpb = varItem > 0 && varTotal > 0 ? cov / Math.sqrt(varItem * varTotal) : 0;
+
+        // Health Status Classification
+        let status = "Keep / Anchor";
+        let statusType = "keep";
+        let isBellwether = false;
+
+        if (D >= 0.35 && p >= 0.25 && p <= 0.85) {
+          status = "Bellwether Predictor";
+          statusType = "bellwether";
+          isBellwether = true;
+        } else if (D < 0 || (D < 0.15 && p >= 0.10 && p <= 0.90)) {
+          status = "Revise / Flawed";
+          statusType = "revise";
+        } else if (p > 0.90) {
+          status = "Too Easy (Ceiling)";
+          statusType = "easy";
+        } else if (p < 0.25) {
+          status = "Too Hard (Floor)";
+          statusType = "hard";
+        }
+
+        // Plain-English explanation
+        let explanation = "";
+        if (isBellwether) {
+          explanation = `${Math.round(upperPct * 100)}% of top-tier students mastered "${q.topic}", compared to only ${Math.round(lowerPct * 100)}% of struggling students (D = ${formatDec(D)}, r_pb = ${rpb.toFixed(2)}). Success on ${q.label} is a reliable predictor of overall mastery.`;
+        } else if (statusType === "revise") {
+          explanation = `Low or negative discrimination (D = ${formatDec(D)}). High and low scorers performed similarly, suggesting ambiguous wording, a trick step, or misalignment with instruction.`;
+        } else if (statusType === "easy") {
+          explanation = `Nearly the entire class (${Math.round(p * 100)}%) answered correctly. Good confidence builder, but offers little differentiation.`;
+        } else if (statusType === "hard") {
+          explanation = `Only ${Math.round(p * 100)}% answered correctly. Indicates a class-wide instructional gap or an overly complex prompt.`;
+        } else {
+          explanation = `Solid, balanced item (${Math.round(p * 100)}% correct, D = ${formatDec(D)}) contributing reliably to overall assessment scores.`;
+        }
+
+        return {
+          ...q,
+          p,
+          upperPct,
+          lowerPct,
+          D,
+          rpb,
+          status,
+          statusType,
+          isBellwether,
+          explanation
+        };
+      });
+
+      // Fallback: if no item hit D >= 0.35 && balanced p, highlight top r_pb item if r_pb >= 0.35
+      let bellwethers = items.filter((it) => it.isBellwether).sort((a, b) => b.D - a.D || b.rpb - a.rpb);
+      if (bellwethers.length === 0) {
+        const bestCandidate = [...items]
+          .filter((it) => it.p >= 0.20 && it.p <= 0.90 && it.rpb >= 0.35)
+          .sort((a, b) => b.rpb - a.rpb)[0];
+        if (bestCandidate) {
+          bestCandidate.isBellwether = true;
+          bestCandidate.status = "Bellwether Predictor";
+          bestCandidate.statusType = "bellwether";
+          bestCandidate.explanation = `Strongest correlation with overall test mastery (r_pb = ${bestCandidate.rpb.toFixed(2)}, D = ${formatDec(bestCandidate.D)}). Students who solved "${bestCandidate.topic}" consistently earned the highest total scores.`;
+          bellwethers = [bestCandidate];
+        }
+      }
+
+      const meanD = items.length > 0 ? items.reduce((sum, it) => sum + it.D, 0) / items.length : 0;
+
+      // Tiers
+      const enrichment = studentTotals.filter((s) => s.pct >= 0.9);
+      const proficient = studentTotals.filter((s) => s.pct >= 0.75 && s.pct < 0.9);
+      const support = studentTotals.filter((s) => s.pct < 0.75);
+
+      return {
+        n,
+        qCount,
+        groupSize,
+        meanPct,
+        medianPct,
+        masteryCount,
+        masteryRate,
+        meanD,
+        studentTotals,
+        items,
+        bellwethers,
+        topBellwether: bellwethers[0] || null,
+        tiers: { enrichment, proficient, support }
+      };
+    }
+
+    // =========================================================================
+    // 5. FILE UPLOAD & PDF.JS MULTI-PAGE RENDERER
+    // =========================================================================
+    async function handleFilesAdded(fileList) {
+      const files = Array.from(fileList || []);
+      if (files.length === 0) return;
+
+      const loadingBar = document.getElementById("pdf-loading-bar");
+      const loadingText = document.getElementById("pdf-loading-text");
+      loadingBar.classList.remove("hidden");
+      loadingBar.classList.add("flex");
+
+      try {
+        for (const file of files) {
+          if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+            loadingText.textContent = `Rendering PDF pages from ${file.name}...`;
+            await renderPdfToQueue(file);
+          } else if (file.type.startsWith("image/")) {
+            loadingText.textContent = `Optimizing image ${file.name}...`;
+            const optimized = await optimizeImageFile(file);
+            state.queuedPages.push({
+              id: generateId("pg"),
+              name: file.name,
+              pageNum: 1,
+              dataUrl: optimized.dataUrl,
+              mimeType: "image/jpeg"
+            });
+          }
+        }
+        renderQueueGrid();
+        showToast(`Added pages to grading queue (${state.queuedPages.length} total).`, "success");
+      } catch (err) {
+        console.error("File processing error:", err);
+        showToast(`Could not process file: ${err.message}`, "error");
+      } finally {
+        loadingBar.classList.add("hidden");
+        loadingBar.classList.remove("flex");
+      }
+    }
+
+    async function renderPdfToQueue(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const baseViewport = page.getViewport({ scale: 1.0 });
+        // Scale so longest dimension is ~1300px for crisp handwriting OCR while staying payload-friendly
+        const targetScale = Math.min(2.0, 1300 / Math.max(baseViewport.width, baseViewport.height));
+        const viewport = page.getViewport({ scale: Math.max(1.2, targetScale) });
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+        state.queuedPages.push({
+          id: generateId("pg"),
+          name: `${file.name} (p.${p})`,
+          pageNum: p,
+          dataUrl,
+          mimeType: "image/jpeg"
+        });
+      }
+    }
+
+    function optimizeImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = reject;
+          img.onload = () => {
+            const maxDim = 1300;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              const ratio = Math.min(maxDim / w, maxDim / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve({ dataUrl: canvas.toDataURL("image/jpeg", 0.82) });
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderQueueGrid() {
+      const section = document.getElementById("queue-section");
+      const grid = document.getElementById("page-thumbnail-grid");
+      const countEl = document.getElementById("queue-count");
+      const clearBtn = document.getElementById("btn-clear-queue");
+      const gradeBtn = document.getElementById("btn-grade-batch");
+
+      countEl.textContent = state.queuedPages.length;
+      gradeBtn.disabled = state.queuedPages.length === 0;
+
+      if (state.queuedPages.length === 0) {
+        section.classList.add("hidden");
+        clearBtn.classList.add("hidden");
+        grid.innerHTML = "";
+        return;
+      }
+
+      section.classList.remove("hidden");
+      clearBtn.classList.remove("hidden");
+
+      grid.innerHTML = state.queuedPages
+        .map(
+          (pg, idx) => `
+          <div class="group relative rounded-xl border border-warmborder bg-[#FAF8F3] overflow-hidden shadow-xs">
+            <img src="${pg.dataUrl}" alt="${escapeHtml(pg.name)}" class="w-full h-32 object-cover" />
+            <div class="px-2 py-1.5 bg-white border-t border-warmborder flex items-center justify-between gap-1">
+              <span class="text-[11px] font-semibold text-ink truncate">Pg ${idx + 1}: ${escapeHtml(pg.name)}</span>
+            </div>
+            <button type="button" data-remove-page="${pg.id}" aria-label="Remove page"
+              class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-ink/80 text-white hover:bg-redpen flex items-center justify-center text-xs transition">
+              ×
+            </button>
+          </div>
+        `
+        )
+        .join("");
+
+      grid.querySelectorAll("[data-remove-page]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-remove-page");
+          state.queuedPages = state.queuedPages.filter((p) => p.id !== id);
+          renderQueueGrid();
+        });
+      });
+    }
+
+    // =========================================================================
+    // 6. GEMINI MULTIMODAL BATCH GRADING & AI REVISION GENERATION
+    // =========================================================================
+    function setGradingProgress(stepIdx, pct) {
+      document.getElementById("grading-progress-bar").style.width = `${pct}%`;
+      document.getElementById("grading-progress-pct").textContent = `${pct}%`;
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`step-${i}`);
+        const dot = el.querySelector("span");
+        if (i < stepIdx) {
+          el.className = "flex items-center gap-2 text-forest font-medium";
+          dot.className = "w-2 h-2 rounded-full bg-emerald-600";
+        } else if (i === stepIdx) {
+          el.className = "flex items-center gap-2 text-forest font-bold";
+          dot.className = "w-2 h-2 rounded-full bg-forest animate-pulse";
+        } else {
+          el.className = "flex items-center gap-2 text-ink-subtle";
+          dot.className = "w-2 h-2 rounded-full bg-warmborder";
+        }
+      }
+    }
+
+    async function gradeBatchWithGemini() {
+      if (state.queuedPages.length === 0) return;
+
+      const assessmentName = document.getElementById("input-assessment-name").value.trim() || "Math Assessment";
+      const classSection = document.getElementById("input-class-section").value.trim() || "Math Class";
+      const assessmentDate = document.getElementById("input-assessment-date").value || todayISO();
+      const answerKey = document.getElementById("input-answer-key").value.trim();
+
+      const progressPanel = document.getElementById("grading-progress-panel");
+      const gradeBtn = document.getElementById("btn-grade-batch");
+      progressPanel.classList.remove("hidden");
+      gradeBtn.disabled = true;
+
+      try {
+        setGradingProgress(1, 18);
+
+        // Build multimodal parts for Gemini
+        const parts = [];
+        parts.push({
+          text: `You are "Math Grandma", an expert, warm, and razor-sharp math teacher and psychometrician.
+You are given ${state.queuedPages.length} scanned pages of a math assessment titled "${assessmentName}" for "${classSection}".
+${answerKey ? `Teacher's Answer Key / Rubric:\n${answerKey}\n` : "No answer key was provided — solve each math problem accurately yourself first."}
+
+CRITICAL INSTRUCTIONS:
+1. AUTO-SEPARATE BY STUDENT: Read the handwritten student name on every page. Group pages belonging to the same student together (supporting multi-page tests per student). NEVER lump multiple students into one entry. If a page has no readable name, label it "Unnamed Student (Page X)".
+2. EXTRA CREDIT: If a page or question is clearly Extra Credit, mark isExtraCredit: true so it is tracked separately from regular test totals.
+3. QUESTION ALIGNMENT: Identify the unified list of questions on the test (e.g., Q1, Q2, Q3...) with their math topic and correct answer.
+4. HANDWRITING TRANSCRIPTION & GRADING: For every student and every question, transcribe their handwritten work verbatim (showing steps and final answer), assign score (1 for correct, 0.5 for partial credit, 0 for incorrect), classify errorType ("none", "conceptual", "procedural", "arithmetic", or "notation"), and write a clear teacher explanation.
+5. PEDAGOGICAL INSIGHTS: Provide individual student strengths and "whatToWorkOn" items with concrete practice suggestions. Also provide a concise executive summary for the Principal, top class-wide reteach priorities (with severity "high", "medium", or "low"), and future test revision suggestions.`
+        });
+
+        state.queuedPages.forEach((pg, idx) => {
+          parts.push({ text: `--- Page ${idx + 1} (${pg.name}) ---` });
+          const base64 = pg.dataUrl.split(",")[1];
+          parts.push({
+            inlineData: {
+              mimeType: pg.mimeType || "image/jpeg",
+              data: base64
+            }
+          });
+        });
+
+        setGradingProgress(2, 42);
+
+        const responseSchema = {
+          type: "OBJECT",
+          properties: {
+            questions: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  id: { type: "STRING" },
+                  label: { type: "STRING" },
+                  topic: { type: "STRING" },
+                  prompt: { type: "STRING" },
+                  correctAnswer: { type: "STRING" },
+                  isExtraCredit: { type: "BOOLEAN" }
+                },
+                required: ["id", "label", "topic", "correctAnswer", "isExtraCredit"]
+              }
+            },
+            students: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  id: { type: "STRING" },
+                  name: { type: "STRING" },
+                  pageNumbers: { type: "ARRAY", items: { type: "INTEGER" } },
+                  strengths: { type: "ARRAY", items: { type: "STRING" } },
+                  workOn: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        skill: { type: "STRING" },
+                        severity: { type: "STRING" },
+                        detail: { type: "STRING" },
+                        practice: { type: "STRING" }
+                      },
+                      required: ["skill", "severity", "detail", "practice"]
+                    }
+                  },
+                  responses: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        questionId: { type: "STRING" },
+                        handwrittenWork: { type: "STRING" },
+                        score: { type: "NUMBER" },
+                        errorType: { type: "STRING" },
+                        feedback: { type: "STRING" }
+                      },
+                      required: ["questionId", "handwrittenWork", "score", "errorType", "feedback"]
+                    }
+                  }
+                },
+                required: ["id", "name", "responses", "strengths", "workOn"]
+              }
+            },
+            executiveSummary: { type: "STRING" },
+            reteachPriorities: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  skill: { type: "STRING" },
+                  severity: { type: "STRING" },
+                  evidence: { type: "STRING" },
+                  routine: { type: "STRING" }
+                },
+                required: ["skill", "severity", "evidence", "routine"]
+              }
+            },
+            revisionSuggestions: {
+              type: "OBJECT",
+              properties: {
+                rewrites: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      questionLabel: { type: "STRING" },
+                      currentIssue: { type: "STRING" },
+                      suggestedRevision: { type: "STRING" },
+                      exampleProblem: { type: "STRING" }
+                    },
+                    required: ["questionLabel", "currentIssue", "suggestedRevision", "exampleProblem"]
+                  }
+                },
+                structural: { type: "ARRAY", items: { type: "STRING" } }
+              },
+              required: ["rewrites", "structural"]
+            }
+          },
+          required: ["questions", "students", "executiveSummary", "reteachPriorities", "revisionSuggestions"]
+        };
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ role: "user", parts }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema
+          }
+        };
+
+        const res = await fetchWithBackoff(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        setGradingProgress(3, 75);
+        const json = await res.json();
+        const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) throw new Error("Empty response from grading engine.");
+
+        const graded = JSON.parse(rawText);
+
+        setGradingProgress(4, 92);
+
+        const newAssessment = {
+          id: generateId("asmt"),
+          name: assessmentName,
+          classSection,
+          date: assessmentDate,
+          answerKey,
+          createdAt: Date.now(),
+          questions: graded.questions || [],
+          students: (graded.students || []).map((s, idx) => ({
+            ...s,
+            id: s.id || generateId(`stu${idx}`)
+          })),
+          executiveSummary: graded.executiveSummary || "",
+          reteachPriorities: graded.reteachPriorities || [],
+          revisionSuggestions: graded.revisionSuggestions || { rewrites: [], structural: [] }
+        };
+
+        await saveAssessment(newAssessment);
+        setGradingProgress(4, 100);
+
+        // Reset queue and switch to Principal Findings
+        state.queuedPages = [];
+        renderQueueGrid();
+        state.selectedStudentId = newAssessment.students[0]?.id || null;
+        switchTab("principal");
+        renderAll();
+        showToast(`Graded ${newAssessment.students.length} students successfully!`, "success");
+      } catch (err) {
+        console.error("Batch grading failed:", err);
+        showToast(`Grading failed: ${err.message}`, "error");
+      } finally {
+        setTimeout(() => {
+          progressPanel.classList.add("hidden");
+          gradeBtn.disabled = state.queuedPages.length === 0;
+        }, 500);
+      }
+    }
+
+    async function refreshAIRevisions() {
+      const asmt = getCurrentAssessment();
+      if (!asmt) return;
+      const psy = computePsychometrics(asmt);
+      if (!psy) return;
+
+      const loading = document.getElementById("revisions-loading");
+      const btn = document.getElementById("btn-refresh-revisions");
+      loading.classList.remove("hidden");
+      loading.classList.add("flex");
+      btn.disabled = true;
+
+      try {
+        const itemSummary = psy.items
+          .map(
+            (it) =>
+              `${it.label} (${it.topic}): p=${Math.round(it.p * 100)}%, Upper=${Math.round(it.upperPct * 100)}%, Lower=${Math.round(it.lowerPct * 100)}%, D=${it.D.toFixed(2)}, r_pb=${it.rpb.toFixed(2)}, Status=${it.status}, Prompt="${it.prompt || it.topic}"`
+          )
+          .join("\n");
+
+        const promptText = `You are Math Grandma, an expert math psychometrician and curriculum designer.
+Based on the live Classical Test Theory metrics below for "${asmt.name}" (${asmt.classSection}, n=${psy.n} students, Mean=${Math.round(psy.meanPct * 100)}%), generate concrete, practical recommendations for revising this assessment before giving it again next year.
+
+Item Psychometrics:
+${itemSummary}
+
+Focus rewrites on items with Low/Negative D, Ceiling (p > 90%), or Floor (p < 25%). Give a specific example revised math problem for each rewrite, plus 3-4 structural assessment design tips.`;
+
+        const schema = {
+          type: "OBJECT",
+          properties: {
+            rewrites: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  questionLabel: { type: "STRING" },
+                  currentIssue: { type: "STRING" },
+                  suggestedRevision: { type: "STRING" },
+                  exampleProblem: { type: "STRING" }
+                },
+                required: ["questionLabel", "currentIssue", "suggestedRevision", "exampleProblem"]
+              }
+            },
+            structural: { type: "ARRAY", items: { type: "STRING" } }
+          },
+          required: ["rewrites", "structural"]
+        };
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+        const res = await fetchWithBackoff(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: promptText }] }],
+            generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+          })
+        });
+
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error("No revision output returned.");
+
+        asmt.revisionSuggestions = JSON.parse(text);
+        await saveAssessment(asmt);
+        renderRevisionsTab(asmt, psy);
+        showToast("AI Test Revisions refreshed with latest scores!", "success");
+      } catch (err) {
+        console.error(err);
+        showToast(`Could not refresh revisions: ${err.message}`, "error");
+      } finally {
+        loading.classList.add("hidden");
+        loading.classList.remove("flex");
+        btn.disabled = false;
+      }
+    }
+
+    // =========================================================================
+    // 7. DEMO DATASET GENERATOR (3 HISTORICAL ASSESSMENTS, 10 STUDENTS)
+    // =========================================================================
+    async function loadDemoBatch() {
+      const demoStudents = [
+        { id: "stu_maya", name: "Maya Goldstein" },
+        { id: "stu_ethan", name: "Ethan Morales" },
+        { id: "stu_noah", name: "Noah Patel" },
+        { id: "stu_chloe", name: "Chloe Kim" },
+        { id: "stu_liam", name: "Liam O'Connor" },
+        { id: "stu_ava", name: "Ava Washington" },
+        { id: "stu_lucas", name: "Lucas Bernstein" },
+        { id: "stu_zoe", name: "Zoe Ramirez" },
+        { id: "stu_david", name: "David Chen" },
+        { id: "stu_hannah", name: "Hannah Brooks" }
+      ];
+
+      // Historical Assessment 1 (Sept)
+      const asmt1 = {
+        id: "demo_asmt_5",
+        name: "Check-In #5: Signed Integers & Number Lines",
+        classSection: "Math 7C",
+        date: "2026-09-24",
+        createdAt: 1790200000000,
+        questions: [
+          { id: "q1", label: "Q1", topic: "Adding opposites", prompt: "Evaluate -7 + 7", correctAnswer: "0", isExtraCredit: false },
+          { id: "q2", label: "Q2", topic: "Adding unlike signs", prompt: "Evaluate -12 + 8", correctAnswer: "-4", isExtraCredit: false },
+          { id: "q3", label: "Q3", topic: "Subtracting negatives", prompt: "Evaluate 5 - (-9)", correctAnswer: "14", isExtraCredit: false },
+          { id: "q4", label: "Q4", topic: "Multi-step integer sum", prompt: "Evaluate -6 - 4 + 13", correctAnswer: "3", isExtraCredit: false },
+          { id: "q5", label: "Q5", topic: "Absolute value distance", prompt: "Find distance between -8 and 5", correctAnswer: "13", isExtraCredit: false }
+        ],
+        students: [
+          { id: "stu_maya", name: "Maya Goldstein", strengths: ["Fluent with signed integer rules"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "-7 + 7 = 0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-12 + 8 = -4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "5 + 9 = 14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-10 + 13 = 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "|-8 - 5| = 13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_ethan", name: "Ethan Morales", strengths: ["Strong number line intuition"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "5 + 9 = 14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-2 + 13 = 11", score: 0, errorType: "arithmetic", feedback: "Computed -6 - 4 as -2 instead of -10." },
+            { questionId: "q5", handwrittenWork: "8 + 5 = 13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_noah", name: "Noah Patel", strengths: ["Accurate additive inverses"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "5 - 9 = -4", score: 0, errorType: "conceptual", feedback: "Did not rewrite subtracting a negative as addition." },
+            { questionId: "q4", handwrittenWork: "-10 + 13 = 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_chloe", name: "Chloe Kim", strengths: ["Clean step-by-step work"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "-3", score: 0, errorType: "conceptual", feedback: "Added -8 + 5 instead of finding distance." }
+          ]},
+          { id: "stu_liam", name: "Liam O'Connor", strengths: ["Understands zero pairs"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "4", score: 0, errorType: "arithmetic", feedback: "Dropped the negative sign." },
+            { questionId: "q3", handwrittenWork: "14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_ava", name: "Ava Washington", strengths: ["Consistent sign checking"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_lucas", name: "Lucas Bernstein", strengths: ["Recognizes opposites"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-20", score: 0, errorType: "conceptual", feedback: "Added magnitudes instead of subtracting." },
+            { questionId: "q3", handwrittenWork: "-4", score: 0, errorType: "conceptual", feedback: "Subtracted 9 instead of adding 9." },
+            { questionId: "q4", handwrittenWork: "-10 + 13 = 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "3", score: 0, errorType: "conceptual", feedback: "Subtracted 8 - 5 instead of spanning zero." }
+          ]},
+          { id: "stu_zoe", name: "Zoe Ramirez", strengths: ["Good effort on multi-step"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "-4", score: 0, errorType: "procedural", feedback: "Missed double negative rule." },
+            { questionId: "q4", handwrittenWork: "11", score: 0, errorType: "arithmetic", feedback: "Sign error on -6 - 4." },
+            { questionId: "q5", handwrittenWork: "13", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_david", name: "David Chen", strengths: ["Solid subtraction of negatives"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-4", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "14", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "3", score: 0, errorType: "conceptual", feedback: "Forgot to cross zero on number line." }
+          ]},
+          { id: "stu_hannah", name: "Hannah Brooks", strengths: ["Knows additive inverses"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "0", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "4", score: 0, errorType: "arithmetic", feedback: "Kept positive sign." },
+            { questionId: "q3", handwrittenWork: "-4", score: 0, errorType: "conceptual", feedback: "Did not add opposite." },
+            { questionId: "q4", handwrittenWork: "15", score: 0, errorType: "arithmetic", feedback: "Computed -6 - 4 as +2." },
+            { questionId: "q5", handwrittenWork: "13", score: 1, errorType: "none", feedback: "Correct." }
+          ]}
+        ],
+        executiveSummary: "Class averaged 74% on Signed Integers. Additive inverses (Q1) are mastered across the board, while subtracting negative integers (Q3) and distance across zero (Q5) strongly differentiated high-performing students from those needing number-line scaffolding.",
+        reteachPriorities: [
+          { skill: "Subtracting negative integers", severity: "high", evidence: "40% of class treated 5 - (-9) as 5 - 9.", routine: "Use two-color counters and rewrite every subtraction as adding the opposite." }
+        ],
+        revisionSuggestions: { rewrites: [], structural: ["Include a drawn number line on Q5 to diagnose conceptual vs. arithmetic slips."] }
+      };
+
+      // Historical Assessment 2 (Oct)
+      const asmt2 = {
+        id: "demo_asmt_6",
+        name: "Check-In #6: Combining Like Terms & Distributive Property",
+        classSection: "Math 7C",
+        date: "2026-10-18",
+        createdAt: 1792300000000,
+        questions: [
+          { id: "q1", label: "Q1", topic: "Combine positive like terms", prompt: "Simplify 4x + 3x + 2", correctAnswer: "7x + 2", isExtraCredit: false },
+          { id: "q2", label: "Q2", topic: "Combine signed like terms", prompt: "Simplify 6y - 9y + 4 - 1", correctAnswer: "-3y + 3", isExtraCredit: false },
+          { id: "q3", label: "Q3", topic: "Distributive property (positive)", prompt: "Expand 3(2a + 5)", correctAnswer: "6a + 15", isExtraCredit: false },
+          { id: "q4", label: "Q4", topic: "Distributive property (negative)", prompt: "Expand -2(4m - 3)", correctAnswer: "-8m + 6", isExtraCredit: false },
+          { id: "q5", label: "Q5", topic: "Distribute & combine", prompt: "Simplify 2(x + 4) + 3x - 1", correctAnswer: "5x + 7", isExtraCredit: false }
+        ],
+        students: [
+          { id: "stu_maya", name: "Maya Goldstein", strengths: ["Flawless distribution"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m + 6", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "2x + 8 + 3x - 1 = 5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_ethan", name: "Ethan Morales", strengths: ["Strong multi-step organization"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m - 6", score: 0, errorType: "arithmetic", feedback: "Missed (-2)(-3) = +6." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_noah", name: "Noah Patel", strengths: ["Improved integer signs"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m + 6", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_chloe", name: "Chloe Kim", strengths: ["Very neat algebraic steps"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m + 6", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_liam", name: "Liam O'Connor", strengths: ["Solid positive distribution"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "3y + 3", score: 0, errorType: "arithmetic", feedback: "Sign slip on 6y - 9y." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m - 6", score: 0, errorType: "procedural", feedback: "Did not distribute negative to second term." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_ava", name: "Ava Washington", strengths: ["Accurate across all items"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m + 6", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_lucas", name: "Lucas Bernstein", strengths: ["Good basic term combining"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 5", score: 0, errorType: "procedural", feedback: "Forgot to multiply 3 by 5." },
+            { questionId: "q4", handwrittenWork: "-8m - 6", score: 0, errorType: "procedural", feedback: "Sign error on second term." },
+            { questionId: "q5", handwrittenWork: "2x + 4 + 3x - 1 = 5x + 3", score: 0, errorType: "procedural", feedback: "Forgot to distribute 2 to 4." }
+          ]},
+          { id: "stu_zoe", name: "Zoe Ramirez", strengths: ["Stronger on positive terms"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m - 6", score: 0, errorType: "arithmetic", feedback: "Sign error distributing -2." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_david", name: "David Chen", strengths: ["Clean multi-step simplification"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "-3y + 3", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m + 6", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q5", handwrittenWork: "5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]},
+          { id: "stu_hannah", name: "Hannah Brooks", strengths: ["Improved signed addition"], workOn: [], responses: [
+            { questionId: "q1", handwrittenWork: "7x + 2", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q2", handwrittenWork: "3y + 3", score: 0, errorType: "arithmetic", feedback: "Dropped negative sign on -3y." },
+            { questionId: "q3", handwrittenWork: "6a + 15", score: 1, errorType: "none", feedback: "Correct." },
+            { questionId: "q4", handwrittenWork: "-8m - 6", score: 0, errorType: "procedural", feedback: "Missed negative times negative." },
+            { questionId: "q5", handwrittenWork: "2x + 8 + 3x - 1 = 5x + 7", score: 1, errorType: "none", feedback: "Correct." }
+          ]}
+        ],
+        executiveSummary: "Class average rose to 82% on Combining Like Terms & Distributive Property. Negative distribution (Q4) emerged as the clearest bellwether separating mastery from partial understanding.",
+        reteachPriorities: [
+          { skill: "Distributing a negative factor across subtraction", severity: "high", evidence: "50% of students wrote -8m - 6 instead of -8m + 6 on Q4.", routine: "Box each term with its preceding sign before multiplying." }
+        ],
+        revisionSuggestions: { rewrites: [], structural: ["Keep Q4 as an anchor item on the unit exam."] }
+      };
+
+      // Primary Current Assessment (Nov — inspired by user's Check-In #7)
+      const asmt3 = {
+        id: "demo_asmt_7",
+        name: "Check-In #7: Equations, Terms & Coefficients",
+        classSection: "Math 7C",
+        date: "2026-11-20",
+        createdAt: 1795100000000,
+        answerKey: "1. Variable: a, Coefficient: 5, Constant: 2\n2. 5 terms (8v, g, -2k, 9h, -15)\n3. p = 9\n4. k = 85\n5. v = 7\n6. h = 3.76\nEC: -2 + 10 = 8",
+        questions: [
+          { id: "q1", label: "Q1", topic: "Variable, coefficient & constant", prompt: "Identify the variable, coefficient, and constant in 5a + 2 = 17.", correctAnswer: "Variable: a; Coefficient: 5; Constant: 2", isExtraCredit: false },
+          { id: "q2", label: "Q2", topic: "Counting all terms (incl. lone variable & constant)", prompt: "How many terms are in 8v + g - 2k + 9h - 15?", correctAnswer: "5 terms", isExtraCredit: false },
+          { id: "q3", label: "Q3", topic: "Solving one-step multiplication (18 = 2p)", prompt: "Solve 18 = 2p", correctAnswer: "p = 9", isExtraCredit: false },
+          { id: "q4", label: "Q4", topic: "Solving one-step division (k/5 = 17)", prompt: "Solve k/5 = 17", correctAnswer: "k = 85", isExtraCredit: false },
+          { id: "q5", label: "Q5", topic: "Decimal division equation (0.7v = 4.9)", prompt: "Solve 0.7v = 4.9", correctAnswer: "v = 7", isExtraCredit: false },
+          { id: "q6", label: "Q6", topic: "Decimal subtraction equation (h + 5.24 = 9)", prompt: "Solve h + 5.24 = 9", correctAnswer: "h = 3.76", isExtraCredit: false },
+          { id: "ec1", label: "EC", topic: "Extra Credit: Signed integer addition", prompt: "Evaluate -2 + 10", correctAnswer: "8", isExtraCredit: true }
+        ],
+        students: [
+          {
+            id: "stu_maya", name: "Maya Goldstein", pageNumbers: [1],
+            strengths: ["Solved all six regular items accurately with clear inverse-operation notation.", "Explicitly boxed all five terms before counting on Q2."],
+            workOn: [],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a; Coefficient: 5; Constant: 2", score: 1, errorType: "none", feedback: "Precise identification of all three components." },
+              { questionId: "q2", handwrittenWork: "8v | g | -2k | 9h | -15 -> 5 terms", score: 1, errorType: "none", feedback: "Correctly counted both lone variable g and constant -15." },
+              { questionId: "q3", handwrittenWork: "18 ÷ 2 = 2p ÷ 2; p = 9", score: 1, errorType: "none", feedback: "Clean division on both sides." },
+              { questionId: "q4", handwrittenWork: "k/5 · 5 = 17 · 5; k = 85", score: 1, errorType: "none", feedback: "Accurate inverse operation." },
+              { questionId: "q5", handwrittenWork: "4.9 ÷ 0.7 = 49 ÷ 7 = 7; v = 7", score: 1, errorType: "none", feedback: "Excellent decimal scaling strategy." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76; h = 3.76", score: 1, errorType: "none", feedback: "Properly aligned zeros for regrouping." },
+              { questionId: "ec1", handwrittenWork: "-2 + 10 = 8", score: 1, errorType: "none", feedback: "Extra credit earned!" }
+            ]
+          },
+          {
+            id: "stu_ava", name: "Ava Washington", pageNumbers: [2],
+            strengths: ["100% mastery across vocabulary and equation solving.", "Includes verification checks by substitution."],
+            workOn: [],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Var = a, Coeff = 5, Const = 2", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q2", handwrittenWork: "5 terms", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q3", handwrittenWork: "18/2 = 9 -> p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "17 × 5 = 85 -> k = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "4.9 / 0.7 = 7.0 -> v = 7", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76 -> h = 3.76", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "ec1", handwrittenWork: "-2 + 10 = 8", score: 1, errorType: "none", feedback: "Extra credit earned!" }
+            ]
+          },
+          {
+            id: "stu_david", name: "David Chen", pageNumbers: [3],
+            strengths: ["Perfect score on all regular equations and algebra vocabulary.", "Shows clean vertical decimal subtraction."],
+            workOn: [],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a, Coefficient: 5, Constant: 2", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q2", handwrittenWork: "5 terms (counted g and -15)", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q3", handwrittenWork: "p = 9 (2 × 9 = 18 ✓)", score: 1, errorType: "none", feedback: "Great multiplication check." },
+              { questionId: "q4", handwrittenWork: "k = 17 × 5 = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "v = 4.9 ÷ 0.7 = 7", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q6", handwrittenWork: "h = 9.00 - 5.24 = 3.76", score: 1, errorType: "none", feedback: "Correct." }
+            ]
+          },
+          {
+            id: "stu_chloe", name: "Chloe Kim", pageNumbers: [4],
+            strengths: ["All four equation-solving problems (Q3–Q6) are completely correct.", "Strong decimal division fluency."],
+            workOn: [
+              { skill: "Distinguishing coefficient from complete term", severity: "medium", detail: "Listed 5a instead of 5 as the coefficient on Q1.", practice: "Use a three-column sort (Term | Coefficient | Variable) for 5a, -3y, and g." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a; Coefficient: 5a; Constant: 2", score: 0.5, errorType: "notation", feedback: "The coefficient is the numerical factor 5, not the entire term 5a." },
+              { questionId: "q2", handwrittenWork: "5 terms", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q3", handwrittenWork: "18 ÷ 2 = 9; p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "Multiply by 5 -> k = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "Divide by 0.7 -> v = 7", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76; h = 3.76", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "ec1", handwrittenWork: "-2 + 10 = 8", score: 1, errorType: "none", feedback: "Extra credit earned!" }
+            ]
+          },
+          {
+            id: "stu_noah", name: "Noah Patel", pageNumbers: [5],
+            strengths: ["Mastered all one-step equations including decimals.", "Consistent upward trajectory from Check-In #5."],
+            workOn: [
+              { skill: "Counting lone variables as terms", severity: "medium", detail: "Counted 4 terms on Q2, omitting lone variable g.", practice: "Rewrite g as 1g before boxing terms in multi-term expressions." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a, Coeff: 5, Constant: 2", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q2", handwrittenWork: "4 terms", score: 0, errorType: "conceptual", feedback: "Missed lone variable g (invisible coefficient 1)." },
+              { questionId: "q3", handwrittenWork: "p = 18/2 = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "k = 17 × 5 = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "49 ÷ 7 = 7; v = 7", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q6", handwrittenWork: "h = 3.76", score: 1, errorType: "none", feedback: "Correct." }
+            ]
+          },
+          {
+            id: "stu_ethan", name: "Ethan Morales", pageNumbers: [6],
+            strengths: ["Strong vocabulary on Q1 and Q2.", "Accurate on whole-number equations Q3 and Q4."],
+            workOn: [
+              { skill: "Transferring equation steps into decimal subtraction", severity: "medium", detail: "Set up vertical subtraction as 5.24 - 9 and obtained 5.14 on Q6.", practice: "Write h = 9.00 - 5.24 horizontally first, then copy in exact order into a place-value grid." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Var: a, Coeff: 5, Const: 2", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q2", handwrittenWork: "5 terms", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q3", handwrittenWork: "p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "k = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "v = 7", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q6", handwrittenWork: "5.24 - 9 = 5.14; h = 5.14", score: 0, errorType: "procedural", feedback: "Reversed minuend and subtrahend when setting up vertical subtraction." }
+            ]
+          },
+          {
+            id: "stu_zoe", name: "Zoe Ramirez", pageNumbers: [7],
+            strengths: ["Correctly solved Q3, Q4, and Q6.", "Shows clear inverse operation labels."],
+            workOn: [
+              { skill: "Decimal place value in division", severity: "high", detail: "Wrote v = 70 on Q5 and checked 0.7 × 70 as 4.9.", practice: "Compare 0.7 × 0.7, 0.7 × 7, and 0.7 × 70 to anchor decimal magnitude." },
+              { skill: "Counting constants as terms", severity: "high", detail: "Circled only 8v, -2k, 9h on Q2, excluding g and -15.", practice: "Box every signed term separated by + or -, including standalone constants." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Var: a; Coeff: 5; Const: 2", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q2", handwrittenWork: "3 terms (8v, -2k, 9h)", score: 0, errorType: "conceptual", feedback: "Excluded lone variable g and constant -15." },
+              { questionId: "q3", handwrittenWork: "18 ÷ 2 = 9; p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "17 × 5 = 85; k = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "4.9 ÷ 0.7 = 70; v = 70", score: 0, errorType: "arithmetic", feedback: "Shifted decimal in numerator only; 0.7 × 70 = 49, not 4.9." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76", score: 1, errorType: "none", feedback: "Correct." }
+            ]
+          },
+          {
+            id: "stu_liam", name: "Liam O'Connor", pageNumbers: [8],
+            strengths: ["Solved Q3 and Q6 accurately."],
+            workOn: [
+              { skill: "Distinguishing coefficient vs. term", severity: "high", detail: "Wrote 5a for coefficient on Q1.", practice: "Highlight only the numeric multiplier in front of the variable." },
+              { skill: "Decimal place value in division", severity: "high", detail: "Wrote v = 0.7 on Q5.", practice: "Estimate quotient first: how many 0.7s fit into 4.9?" }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a; Coefficient: 5a; Constant: 2", score: 0, errorType: "conceptual", feedback: "Included the variable inside the coefficient." },
+              { questionId: "q2", handwrittenWork: "4 terms", score: 0, errorType: "conceptual", feedback: "Missed constant -15." },
+              { questionId: "q3", handwrittenWork: "p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "k = 85", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q5", handwrittenWork: "4.9 ÷ 0.7 = 0.7; v = 0.7", score: 0, errorType: "arithmetic", feedback: "Kept a decimal point in the quotient after dividing 49 by 7." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76; h = 3.76", score: 1, errorType: "none", feedback: "Correct." }
+            ]
+          },
+          {
+            id: "stu_hannah", name: "Hannah Brooks", pageNumbers: [9],
+            strengths: ["Correctly solved Q3 and Q6."],
+            workOn: [
+              { skill: "Choosing the inverse operation for division equations", severity: "high", detail: "Divided 17 by 5 instead of multiplying on Q4.", practice: "Contrast 5k = 17, k + 5 = 17, and k/5 = 17 side by side; name the operation first." },
+              { skill: "Decimal division magnitude", severity: "high", detail: "Wrote v = 0.7 on Q5.", practice: "Multiply both dividend and divisor by 10 to form 49 ÷ 7." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: a; Coefficient: 2; Constant: 5", score: 0, errorType: "conceptual", feedback: "Reversed the coefficient (5) and additive constant (2)." },
+              { questionId: "q2", handwrittenWork: "4 terms", score: 0, errorType: "conceptual", feedback: "Omitted lone variable g." },
+              { questionId: "q3", handwrittenWork: "18 ÷ 2 = 9; p = 9", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "q4", handwrittenWork: "17 ÷ 5 = 3.4; k = 3.4", score: 0, errorType: "procedural", feedback: "Divided instead of multiplying by 5 to undo k/5." },
+              { questionId: "q5", handwrittenWork: "0.7v = 4.9 -> v = 0.7", score: 0, errorType: "arithmetic", feedback: "Place value error in decimal division." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76", score: 1, errorType: "none", feedback: "Correct." },
+              { questionId: "ec1", handwrittenWork: "-2 + 10 = 12", score: 0, errorType: "arithmetic", feedback: "Added magnitudes instead of starting at -2 on the number line." }
+            ]
+          },
+          {
+            id: "stu_lucas", name: "Lucas Bernstein", pageNumbers: [10],
+            strengths: ["Correctly solved Q6 decimal subtraction equation."],
+            workOn: [
+              { skill: "Choosing the inverse operation from equation structure", severity: "high", detail: "Subtracted 2 on Q3 and divided by 5 on Q4.", practice: "Require naming the operation acting on the variable before choosing its inverse." },
+              { skill: "Algebra vocabulary (terms, coefficients, constants)", severity: "high", detail: "Missed both Q1 and Q2.", practice: "Color-code variables, coefficients, and constants in 5 warm-up expressions." }
+            ],
+            responses: [
+              { questionId: "q1", handwrittenWork: "Variable: 5a; Coefficient: 2; Constant: 17", score: 0, errorType: "conceptual", feedback: "Confused term, constant, and equation right-hand side." },
+              { questionId: "q2", handwrittenWork: "3 terms", score: 0, errorType: "conceptual", feedback: "Only counted terms with visible coefficients." },
+              { questionId: "q3", handwrittenWork: "18 - 2 = 16; p = 16", score: 0, errorType: "procedural", feedback: "Subtracted 2 instead of dividing by 2." },
+              { questionId: "q4", handwrittenWork: "17 ÷ 5 = 3.4; k = 3.4", score: 0, errorType: "procedural", feedback: "Divided instead of multiplying by 5." },
+              { questionId: "q5", handwrittenWork: "4.9 - 0.7 = 4.2; v = 4.2", score: 0, errorType: "procedural", feedback: "Subtracted 0.7 instead of dividing by 0.7." },
+              { questionId: "q6", handwrittenWork: "9.00 - 5.24 = 3.76; h = 3.76", score: 1, errorType: "none", feedback: "Accurate subtraction and regrouping!" }
+            ]
+          }
+        ],
+        executiveSummary: "Across the 10 students assessed in Math 7C on Check-In #7, the class achieved a 74% average with 60% reaching proficiency/mastery (≥80%). Whole-number multiplication equations (Q3) and decimal subtraction equations (Q6) are well-established strengths (90% mastery). However, psychometric analysis reveals that Counting All Terms (Q2) and Decimal Division Equations (Q5) act as primary Bellwether predictors—separating top-tier students (100% accuracy) from students needing targeted intervention (0% accuracy). Reteaching term structure and decimal place-value scaling will lift the four Targeted Support students before the unit exam.",
+        reteachPriorities: [
+          {
+            skill: "Counting every term, including lone variables and constants",
+            severity: "high",
+            evidence: "50% of students missed Q2 (Noah, Zoe, Liam, Hannah, Lucas), most commonly omitting lone variable g or constant -15.",
+            routine: "Have students rewrite expressions as sums of signed terms (8v + 1g + (-2k) + 9h + (-15)) and draw a box around each term."
+          },
+          {
+            skill: "Decimal place value in multiplication & division equations",
+            severity: "high",
+            evidence: "40% of students missed Q5 (Zoe wrote 70; Liam and Hannah wrote 0.7; Lucas subtracted).",
+            routine: "Run a 3-minute magnitude warm-up comparing 0.7 × 0.7, 0.7 × 7, and 0.7 × 70, then require scaling 4.9 ÷ 0.7 to 49 ÷ 7."
+          },
+          {
+            skill: "Choosing the inverse operation from equation structure",
+            severity: "medium",
+            evidence: "Hannah and Lucas divided instead of multiplying on k/5 = 17 (Q4).",
+            routine: "Contrast 5k = 17, k + 5 = 17, and k/5 = 17 side-by-side; require students to name the operation before writing its inverse."
+          }
+        ],
+        revisionSuggestions: {
+          rewrites: [
+            {
+              questionLabel: "Q3",
+              currentIssue: "Ceiling effect (p = 90%, D = 0.33). Nearly every student solved 18 = 2p effortlessly, offering minimal diagnostic differentiation.",
+              suggestedRevision: "Introduce a negative coefficient or non-integer quotient to test true inverse-operation fluency rather than mental multiplication facts.",
+              exampleProblem: "Solve for p: -24 = 3p   (or  15 = 2p)"
+            },
+            {
+              questionLabel: "Q6",
+              currentIssue: "Ceiling effect with zero discrimination (p = 90%, D = 0.00). Both upper and lower groups scored similarly.",
+              suggestedRevision: "Pair decimal subtraction with a negative constant or place the variable on the right-hand side to prevent rote setup.",
+              exampleProblem: "Solve for h: 9.2 = h + 5.48  (Show your check by addition.)"
+            }
+          ],
+          structural: [
+            "Preserve Q2 (Counting Terms) and Q5 (Decimal Division) as Bellwether anchor items on future unit assessments—they cleanly separate conceptual mastery from surface memorization.",
+            "Add an explicit 'Check your answer by substitution' box on Q4 and Q5 so students self-catch decimal magnitude errors like v = 70.",
+            "On Q1, clarify formatting with three separate labeled blanks (Variable: ___, Coefficient: ___, Constant: ___) to distinguish notation slips (writing '5a') from conceptual confusion."
+          ]
+        }
+      };
+
+      // Save all 3 demo assessments
+      await saveAssessment(asmt1);
+      await saveAssessment(asmt2);
+      await saveAssessment(asmt3);
+
+      state.currentAssessmentId = asmt3.id;
+      state.selectedStudentId = asmt3.students[0].id;
+      state.progressStudentName = asmt3.students[0].name;
+
+      switchTab("principal");
+      renderAll();
+      showToast("Demo class loaded (10 students + 3 term check-ins)!", "success");
+    }
+
+    // =========================================================================
+    // 8. RENDERERS FOR ALL 6 TABS
+    // =========================================================================
+    function renderAll() {
+      renderHeaderControls();
+      const asmt = getCurrentAssessment();
+      const psy = asmt ? computePsychometrics(asmt) : null;
+
+      renderPrincipalTab(asmt, psy);
+      renderPsychometricsTab(asmt, psy);
+      renderStudentsTab(asmt, psy);
+      renderRevisionsTab(asmt, psy);
+      renderProgressTab();
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderHeaderControls() {
+      const switcher = document.getElementById("assessment-switcher");
+      const countBadge = document.getElementById("nav-student-count");
+
+      if (state.assessments.length === 0) {
+        switcher.innerHTML = `<option value="">No assessments loaded</option>`;
+        countBadge.classList.add("hidden");
+        return;
+      }
+
+      switcher.innerHTML = state.assessments
+        .map(
+          (a) =>
+            `<option value="${a.id}" ${a.id === state.currentAssessmentId ? "selected" : ""}>${escapeHtml(a.name)} (${escapeHtml(a.date || "")})</option>`
+        )
+        .join("");
+
+      const current = getCurrentAssessment();
+      if (current && current.students) {
+        countBadge.textContent = current.students.length;
+        countBadge.classList.remove("hidden");
+      } else {
+        countBadge.classList.add("hidden");
+      }
+    }
+
+    // --- TAB 2: PRINCIPAL FINDINGS ---
+    function renderPrincipalTab(asmt, psy) {
+      const empty = document.getElementById("principal-empty");
+      const content = document.getElementById("principal-content");
+
+      if (!asmt || !psy) {
+        empty.classList.remove("hidden");
+        content.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      content.classList.remove("hidden");
+
+      document.getElementById("memo-title").textContent = asmt.name;
+      document.getElementById("memo-class").textContent = asmt.classSection || "—";
+      document.getElementById("memo-date").textContent = asmt.date || "—";
+      document.getElementById("memo-count").textContent = `${psy.n} students (${psy.qCount} items)`;
+
+      document.getElementById("memo-red-score").textContent = formatPct(psy.meanPct);
+      const meanPts = (psy.meanPct * psy.qCount).toFixed(1);
+      document.getElementById("memo-red-sub").textContent = `${meanPts} / ${psy.qCount} avg`;
+
+      // KPIs
+      document.getElementById("kpi-avg").textContent = formatPct(psy.meanPct);
+      document.getElementById("kpi-avg-sub").textContent = `${meanPts} of ${psy.qCount} pts`;
+      document.getElementById("kpi-median").textContent = formatPct(psy.medianPct);
+      document.getElementById("kpi-mastery").textContent = formatPct(psy.masteryRate);
+      document.getElementById("kpi-disc").textContent = formatDec(psy.meanD);
+      document.getElementById("kpi-disc-sub").textContent =
+        psy.meanD >= 0.35 ? "Strong separation" : psy.meanD >= 0.2 ? "Moderate separation" : "Needs item tuning";
+
+      if (psy.topBellwether) {
+        document.getElementById("kpi-bellwether").textContent = psy.topBellwether.label;
+        document.getElementById("kpi-bellwether-sub").textContent = `D = ${formatDec(psy.topBellwether.D)} · ${psy.topBellwether.topic}`;
+      } else {
+        document.getElementById("kpi-bellwether").textContent = "None";
+        document.getElementById("kpi-bellwether-sub").textContent = "Uniform scores";
+      }
+
+      // Summary
+      const summaryDisplay = document.getElementById("memo-summary-display");
+      summaryDisplay.textContent =
+        asmt.executiveSummary ||
+        `Across ${psy.n} students assessed on ${asmt.name}, the class achieved a ${formatPct(psy.meanPct)} average with ${psy.masteryCount} of ${psy.n} students (${formatPct(psy.masteryRate)}) reaching mastery (≥80%).`;
+
+      // Bellwethers
+      const bellList = document.getElementById("memo-bellwether-list");
+      if (psy.bellwethers.length === 0) {
+        bellList.innerHTML = `<p class="text-sm text-ink-muted">No single question met the Bellwether threshold (D ≥ 0.35, balanced difficulty). Check Psychometrics for details.</p>`;
+      } else {
+        bellList.innerHTML = psy.bellwethers
+          .map(
+            (b) => `
+            <div class="bg-white/90 rounded-xl border border-forest/20 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-forest text-white text-xs font-bold">${escapeHtml(b.label)}</span>
+                  <span class="font-semibold text-ink">${escapeHtml(b.topic)}</span>
+                </div>
+                <p class="text-xs text-ink-muted mt-1 leading-relaxed">${escapeHtml(b.explanation)}</p>
+              </div>
+              <div class="shrink-0 flex sm:flex-col items-end gap-2 sm:gap-0.5 text-right">
+                <span class="text-sm font-bold text-forest">D = ${formatDec(b.D)}</span>
+                <span class="text-[11px] text-ink-subtle">r<sub>pb</sub> = ${b.rpb.toFixed(2)} · p = ${formatPct(b.p)}</span>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+      }
+
+      // Tiers
+      const tiersGrid = document.getElementById("memo-tiers-grid");
+      const tierDefs = [
+        { title: "Enrichment (≥ 90%)", list: psy.tiers.enrichment, color: "border-emerald-200 bg-emerald-50/50", badge: "bg-emerald-700 text-white" },
+        { title: "Proficient (75%–89%)", list: psy.tiers.proficient, color: "border-amber-200 bg-amber-50/50", badge: "bg-amber-700 text-white" },
+        { title: "Targeted Support (< 75%)", list: psy.tiers.support, color: "border-redpen-border bg-redpen-light/60", badge: "bg-redpen text-white" }
+      ];
+      tiersGrid.innerHTML = tierDefs
+        .map(
+          (t) => `
+          <div class="rounded-xl border ${t.color} p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-ink">${t.title}</h4>
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${t.badge}">${t.list.length} (${formatPct(t.list.length / psy.n)})</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${
+                t.list.length > 0
+                  ? t.list
+                      .map(
+                        (s) =>
+                          `<span class="px-2 py-0.5 rounded-lg bg-white border border-warmborder text-xs font-medium text-ink">${escapeHtml(s.name)} <span class="text-ink-subtle">(${formatPct(s.pct)})</span></span>`
+                      )
+                      .join("")
+                  : `<span class="text-xs text-ink-subtle italic">No students in this tier</span>`
+              }
+            </div>
+          </div>
+        `
+        )
+        .join("");
+
+      // Reteach Priorities
+      const prioList = document.getElementById("memo-priorities-list");
+      const priorities = asmt.reteachPriorities || [];
+      if (priorities.length === 0) {
+        prioList.innerHTML = `<p class="text-sm text-ink-muted italic">No major reteach priorities flagged for this assessment.</p>`;
+      } else {
+        prioList.innerHTML = priorities
+          .map((pr) => {
+            const sev = (pr.severity || "medium").toLowerCase();
+            const badgeCls =
+              sev === "high"
+                ? "bg-redpen text-white"
+                : sev === "medium"
+                ? "bg-amber-600 text-white"
+                : "bg-stone-200 text-ink";
+            return `
+              <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4 space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <h4 class="font-semibold text-sm text-ink">${escapeHtml(pr.skill)}</h4>
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase ${badgeCls}">${escapeHtml(sev)}</span>
+                </div>
+                <p class="text-xs text-ink-muted">${escapeHtml(pr.evidence)}</p>
+                <p class="text-xs text-ink pt-1"><strong class="text-forest">Classroom Routine:</strong> ${escapeHtml(pr.routine)}</p>
+              </div>
+            `;
+          })
+          .join("");
+      }
+    }
+
+    // --- TAB 3: PSYCHOMETRICS & BELLWETHERS ---
+    function renderPsychometricsTab(asmt, psy) {
+      const empty = document.getElementById("psychometrics-empty");
+      const content = document.getElementById("psychometrics-content");
+
+      if (!asmt || !psy) {
+        empty.classList.remove("hidden");
+        content.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      content.classList.remove("hidden");
+
+      document.getElementById("psy-split-label").textContent = `Top ${psy.groupSize} vs. Bottom ${psy.groupSize} students`;
+
+      // Bellwether Spotlight Cards
+      const bwGrid = document.getElementById("bellwether-cards-grid");
+      if (psy.bellwethers.length > 0) {
+        bwGrid.innerHTML = psy.bellwethers
+          .map(
+            (b) => `
+            <div class="bg-card rounded-2xl border-2 border-forest/35 shadow-editorial p-5 space-y-2 relative overflow-hidden">
+              <div class="flex items-center justify-between gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-forest text-white">
+                  <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                  Bellwether Question: ${escapeHtml(b.label)}
+                </span>
+                <span class="font-mono text-sm font-bold text-forest">D = ${formatDec(b.D)} · r<sub>pb</sub> = ${b.rpb.toFixed(2)}</span>
+              </div>
+              <h3 class="font-serif text-lg font-bold text-ink">${escapeHtml(b.topic)}</h3>
+              <p class="text-xs text-ink-muted leading-relaxed">${escapeHtml(b.explanation)}</p>
+              <div class="flex items-center gap-4 pt-1 text-xs">
+                <span class="text-emerald-800 font-semibold">Upper Group: ${formatPct(b.upperPct)}</span>
+                <span class="text-redpen font-semibold">Lower Group: ${formatPct(b.lowerPct)}</span>
+                <span class="text-ink-muted">Overall p: ${formatPct(b.p)}</span>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+      } else {
+        bwGrid.innerHTML = `
+          <div class="md:col-span-2 bg-card rounded-2xl border border-warmborder p-5 text-sm text-ink-muted">
+            No items currently meet the Bellwether criteria (D ≥ 0.35 and 25% ≤ p ≤ 85%). Review the Item Analysis Matrix below to inspect item discrimination.
+          </div>
+        `;
+      }
+
+      // Item Analysis Table
+      const tbody = document.getElementById("item-analysis-tbody");
+      tbody.innerHTML = psy.items
+        .map((it) => {
+          const badgeMap = {
+            bellwether: "bg-forest text-white",
+            keep: "bg-forest-light text-forest border border-forest/20",
+            easy: "bg-sky-100 text-sky-900",
+            hard: "bg-amber-100 text-amber-900",
+            revise: "bg-redpen-light text-redpen border border-redpen-border"
+          };
+          return `
+            <tr class="hover:bg-[#FAF8F3]/80 transition">
+              <td class="py-3 px-4 font-bold text-ink">${escapeHtml(it.label)}</td>
+              <td class="py-3 px-4">
+                <div class="font-medium text-ink">${escapeHtml(it.topic)}</div>
+                ${it.prompt ? `<div class="text-xs text-ink-subtle truncate max-w-xs">${escapeHtml(it.prompt)}</div>` : ""}
+              </td>
+              <td class="py-3 px-4 text-right font-mono font-semibold">${formatPct(it.p)}</td>
+              <td class="py-3 px-4 text-right font-mono text-emerald-800">${formatPct(it.upperPct)}</td>
+              <td class="py-3 px-4 text-right font-mono text-redpen">${formatPct(it.lowerPct)}</td>
+              <td class="py-3 px-4 text-right font-mono font-bold ${it.D >= 0.35 ? "text-forest" : it.D < 0.15 ? "text-redpen" : "text-ink"}">${formatDec(it.D)}</td>
+              <td class="py-3 px-4 text-right font-mono">${it.rpb.toFixed(2)}</td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeMap[it.statusType] || ""}">
+                  ${escapeHtml(it.status)}
+                </span>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      // Render Charts (only if visible or defer slightly so canvas has dimensions)
+      renderPsychometricCharts(psy);
+    }
+
+    function renderPsychometricCharts(psy) {
+      if (!window.Chart) return;
+
+      // Destroy existing instances
+      ["quadrant", "histogram", "barMastery"].forEach((key) => {
+        if (state.charts[key]) {
+          state.charts[key].destroy();
+          state.charts[key] = null;
+        }
+      });
+
+      // 1. Psychometric Quadrant Scatter Plot with Bellwether Sweet Spot Plugin
+      const sweetSpotPlugin = {
+        id: "bellwetherSweetSpot",
+        beforeDraw(chart) {
+          const { ctx, scales: { x, y } } = chart;
+          if (!x || !y) return;
+          ctx.save();
+          const left = x.getPixelForValue(25);
+          const right = x.getPixelForValue(85);
+          const top = y.getPixelForValue(1.0);
+          const bottom = y.getPixelForValue(0.35);
+
+          ctx.fillStyle = "rgba(27, 67, 50, 0.09)";
+          ctx.fillRect(left, top, right - left, bottom - top);
+          ctx.strokeStyle = "rgba(27, 67, 50, 0.45)";
+          ctx.setLineDash([5, 4]);
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(left, top, right - left, bottom - top);
+
+          ctx.fillStyle = "#1B4332";
+          ctx.font = "600 11px Inter, sans-serif";
+          ctx.fillText("Bellwether Sweet Spot", left + 8, top + 16);
+          ctx.restore();
+        }
+      };
+
+      const pointLabelsPlugin = {
+        id: "scatterPointLabels",
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          const meta = chart.getDatasetMeta(0);
+          ctx.save();
+          ctx.font = "700 11px Inter, sans-serif";
+          ctx.fillStyle = "#1F2421";
+          meta.data.forEach((pt, idx) => {
+            const raw = chart.data.datasets[0].data[idx];
+            if (raw && raw.label) {
+              ctx.fillText(raw.label, pt.x + 8, pt.y + 4);
+            }
+          });
+          ctx.restore();
+        }
+      };
+
+      const quadCtx = document.getElementById("chart-quadrant").getContext("2d");
+      state.charts.quadrant = new Chart(quadCtx, {
+        type: "scatter",
+        data: {
+          datasets: [
+            {
+              label: "Questions",
+              data: psy.items.map((it) => ({
+                x: Math.round(it.p * 100),
+                y: Number(it.D.toFixed(2)),
+                label: it.label,
+                topic: it.topic,
+                status: it.status
+              })),
+              pointRadius: psy.items.map((it) => (it.isBellwether ? 9 : 7)),
+              pointHoverRadius: 11,
+              backgroundColor: psy.items.map((it) =>
+                it.isBellwether ? "#1B4332" : it.statusType === "revise" ? "#B91C1C" : "#6B7280"
+              ),
+              borderColor: "#FFFFFF",
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const d = ctx.raw;
+                  return `${d.label} (${d.topic}): p=${d.x}%, D=${formatDec(d.y)} [${d.status}]`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: "Difficulty Index (% Correct)", font: { size: 11, weight: "600" } },
+              min: 0,
+              max: 105,
+              grid: { color: "#EFECE4" }
+            },
+            y: {
+              title: { display: true, text: "Discrimination Index (D)", font: { size: 11, weight: "600" } },
+              min: -0.4,
+              max: 1.05,
+              grid: { color: "#EFECE4" }
+            }
+          }
+        },
+        plugins: [sweetSpotPlugin, pointLabelsPlugin]
+      });
+
+      // 2. Class Score Distribution Histogram
+      const buckets = [
+        { label: "< 60%", count: 0 },
+        { label: "60–69%", count: 0 },
+        { label: "70–79%", count: 0 },
+        { label: "80–89%", count: 0 },
+        { label: "90–100%", count: 0 }
+      ];
+      psy.studentTotals.forEach((s) => {
+        const p = s.pct * 100;
+        if (p < 60) buckets[0].count++;
+        else if (p < 70) buckets[1].count++;
+        else if (p < 80) buckets[2].count++;
+        else if (p < 90) buckets[3].count++;
+        else buckets[4].count++;
+      });
+
+      const histCtx = document.getElementById("chart-histogram").getContext("2d");
+      state.charts.histogram = new Chart(histCtx, {
+        type: "bar",
+        data: {
+          labels: buckets.map((b) => b.label),
+          datasets: [
+            {
+              label: "Students",
+              data: buckets.map((b) => b.count),
+              backgroundColor: ["#B91C1C", "#DC6B4A", "#D97706", "#2D6A4F", "#1B4332"],
+              borderRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: "#EFECE4" } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 3. Mastery vs Discrimination Grouped Bar Chart
+      const barCtx = document.getElementById("chart-bar-mastery").getContext("2d");
+      state.charts.barMastery = new Chart(barCtx, {
+        type: "bar",
+        data: {
+          labels: psy.items.map((it) => `${it.label}: ${it.topic.slice(0, 22)}${it.topic.length > 22 ? "…" : ""}`),
+          datasets: [
+            {
+              label: "% Correct (p)",
+              data: psy.items.map((it) => Math.round(it.p * 100)),
+              backgroundColor: "#2D6A4F",
+              borderRadius: 6
+            },
+            {
+              label: "Discrimination (D × 100)",
+              data: psy.items.map((it) => Math.round(it.D * 100)),
+              backgroundColor: "#B91C1C",
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "top" } },
+          scales: {
+            y: { min: -40, max: 105, grid: { color: "#EFECE4" }, ticks: { callback: (v) => `${v}%` } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // --- TAB 4: STUDENTS & INTERACTIVE GRADEBOOK ---
+    function getPriorStudentScore(studentName, currentAsmt) {
+      const older = state.assessments
+        .filter((a) => a.id !== currentAsmt.id && (a.date || "") <= (currentAsmt.date || ""))
+        .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      for (const a of older) {
+        const psy = computePsychometrics(a);
+        if (!psy) continue;
+        const match = psy.studentTotals.find((s) => s.name.toLowerCase() === studentName.toLowerCase());
+        if (match) return match.pct;
+      }
+      return null;
+    }
+
+    function renderStudentsTab(asmt, psy) {
+      const empty = document.getElementById("students-empty");
+      const content = document.getElementById("students-content");
+
+      if (!asmt || !psy) {
+        empty.classList.remove("hidden");
+        content.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      content.classList.remove("hidden");
+
+      // Ensure a valid selected student
+      if (!state.selectedStudentId || !asmt.students.find((s) => s.id === state.selectedStudentId)) {
+        state.selectedStudentId = asmt.students[0]?.id || null;
+      }
+
+      // Filter & sort roster
+      let list = psy.studentTotals.filter((s) =>
+        s.name.toLowerCase().includes(state.studentSearch.toLowerCase())
+      );
+      if (state.studentSort === "name") {
+        list.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (state.studentSort === "score-desc") {
+        list.sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name));
+      } else if (state.studentSort === "score-asc") {
+        list.sort((a, b) => a.pct - b.pct || a.name.localeCompare(b.name));
+      }
+
+      const rosterEl = document.getElementById("student-roster-list");
+      rosterEl.innerHTML = list
+        .map((st) => {
+          const active = st.studentId === state.selectedStudentId;
+          const prior = getPriorStudentScore(st.name, asmt);
+          let deltaBadge = "";
+          if (prior !== null) {
+            const diff = Math.round((st.pct - prior) * 100);
+            if (diff > 0) deltaBadge = `<span class="text-[11px] font-semibold text-emerald-700">▲ +${diff}%</span>`;
+            else if (diff < 0) deltaBadge = `<span class="text-[11px] font-semibold text-redpen">▼ ${diff}%</span>`;
+            else deltaBadge = `<span class="text-[11px] text-ink-subtle">— 0%</span>`;
+          }
+          const tierDot = st.pct >= 0.9 ? "bg-emerald-600" : st.pct >= 0.75 ? "bg-amber-500" : "bg-redpen";
+          return `
+            <button type="button" data-select-student="${st.studentId}"
+              class="w-full text-left px-4 py-3.5 flex items-center justify-between gap-2 hover:bg-[#FAF8F3] transition ${active ? "bg-forest-light/60 border-l-4 border-forest" : ""}">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full shrink-0 ${tierDot}"></span>
+                  <span class="font-semibold text-sm text-ink truncate">${escapeHtml(st.name)}</span>
+                </div>
+                <div class="flex items-center gap-2 mt-0.5 pl-4">
+                  <span class="text-xs text-ink-muted">${st.earned}/${st.max} pts</span>
+                  ${deltaBadge}
+                </div>
+              </div>
+              <div class="shrink-0 font-hand text-xl font-bold text-redpen px-2 py-0.5 rounded-full border border-redpen/35 bg-redpen-light/40">
+                ${formatPct(st.pct)}
+              </div>
+            </button>
+          `;
+        })
+        .join("");
+
+      rosterEl.querySelectorAll("[data-select-student]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.selectedStudentId = btn.getAttribute("data-select-student");
+          renderStudentsTab(asmt, psy);
+          if (window.lucide) window.lucide.createIcons();
+        });
+      });
+
+      // Render Selected Student Detail
+      const detailPane = document.getElementById("student-detail-pane");
+      const stu = asmt.students.find((s) => s.id === state.selectedStudentId);
+      const stuStat = psy.studentTotals.find((s) => s.studentId === state.selectedStudentId);
+
+      if (!stu || !stuStat) {
+        detailPane.innerHTML = `<p class="text-sm text-ink-muted">Select a student from the roster.</p>`;
+        return;
+      }
+
+      const regularQs = asmt.questions.filter((q) => !q.isExtraCredit);
+      const extraQs = asmt.questions.filter((q) => q.isExtraCredit);
+      const tierLabel = stuStat.pct >= 0.9 ? "Enrichment" : stuStat.pct >= 0.75 ? "Proficient" : "Targeted Support";
+      const tierBadgeCls =
+        stuStat.pct >= 0.9
+          ? "bg-emerald-100 text-emerald-900"
+          : stuStat.pct >= 0.75
+          ? "bg-amber-100 text-amber-900"
+          : "bg-redpen-light text-redpen border border-redpen-border";
+
+      detailPane.innerHTML = `
+        <!-- Student Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-warmborder pb-5">
+          <div class="space-y-1.5 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${tierBadgeCls}">${tierLabel}</span>
+              ${stu.pageNumbers && stu.pageNumbers.length ? `<span class="text-xs text-ink-subtle">Source Pg: ${stu.pageNumbers.join(", ")}</span>` : ""}
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="edit-student-name-input" type="text" value="${escapeHtml(stu.name)}"
+                class="font-serif text-2xl font-bold text-ink bg-transparent border-b border-transparent hover:border-warmborder focus:border-forest focus:outline-none py-0.5 w-full max-w-sm"
+                title="Click to edit student name" />
+              <i data-lucide="pencil" class="w-3.5 h-3.5 text-ink-subtle shrink-0"></i>
+            </div>
+          </div>
+          <!-- Red-Pen Circled Grade -->
+          <div class="relative inline-flex flex-col items-center justify-center px-6 py-2.5 shrink-0 self-start sm:self-center">
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 150 75" preserveAspectRatio="none">
+              <path d="M 12 38 C 10 10, 134 5, 140 34 C 145 62, 18 70, 9 42 C 7 34, 14 22, 26 16"
+                fill="none" stroke="#B91C1C" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+            <span class="font-hand text-3xl font-bold text-redpen leading-none">${stuStat.earned}/${stuStat.max}</span>
+            <span class="font-hand text-base font-bold text-redpen leading-tight">${formatPct(stuStat.pct)}</span>
+          </div>
+        </div>
+
+        <!-- Strengths & What to Work On -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-forest/20 bg-forest-light/35 p-4 space-y-2">
+            <h4 class="font-serif text-sm font-bold text-forest flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> Strengths
+            </h4>
+            ${
+              stu.strengths && stu.strengths.length > 0
+                ? `<ul class="text-xs text-ink space-y-1.5 list-disc pl-4">${stu.strengths.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>`
+                : `<p class="text-xs text-ink-muted italic">Consistent effort shown on work.</p>`
+            }
+          </div>
+          <div class="rounded-xl border border-warmborder bg-[#FAF8F3] p-4 space-y-2">
+            <h4 class="font-serif text-sm font-bold text-redpen flex items-center gap-1.5">
+              <i data-lucide="target" class="w-4 h-4"></i> What to Work On
+            </h4>
+            ${
+              stu.workOn && stu.workOn.length > 0
+                ? `<div class="space-y-2.5">${stu.workOn
+                    .map(
+                      (w) => `
+                      <div class="text-xs space-y-0.5">
+                        <div class="font-semibold text-ink">${escapeHtml(w.skill)}</div>
+                        <div class="text-ink-muted">${escapeHtml(w.detail)}</div>
+                        <div class="text-forest"><strong>Practice:</strong> ${escapeHtml(w.practice)}</div>
+                      </div>
+                    `
+                    )
+                    .join("")}</div>`
+                : `<p class="text-xs text-emerald-800 font-medium">Mastered all core skills on this check-in — ready for enrichment!</p>`
+            }
+          </div>
+        </div>
+
+        <!-- Question-by-Question Breakdown with Inline Score Overrides -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-serif text-lg font-bold text-ink">Question-by-Question Work</h3>
+            <span class="text-xs text-ink-subtle">Click Correct / Partial / Incorrect to override any score</span>
+          </div>
+          <div class="space-y-3">
+            ${regularQs
+              .map((q) => renderStudentQuestionCard(stu, q))
+              .join("")}
+          </div>
+        </div>
+
+        ${
+          extraQs.length > 0
+            ? `
+            <div class="space-y-3 pt-2 border-t border-warmborder">
+              <h3 class="font-serif text-base font-bold text-forest flex items-center gap-1.5">
+                <i data-lucide="star" class="w-4 h-4"></i> Extra Credit (Tracked Separately)
+              </h3>
+              <div class="space-y-2.5">
+                ${extraQs.map((q) => renderStudentQuestionCard(stu, q)).join("")}
+              </div>
+            </div>
+          `
+            : ""
+        }
+      `;
+
+      // Bind Editable Student Name
+      const nameInput = document.getElementById("edit-student-name-input");
+      nameInput.addEventListener("change", async () => {
+        const updatedName = nameInput.value.trim();
+        if (!updatedName || updatedName === stu.name) return;
+        stu.name = updatedName;
+        await saveAssessment(asmt);
+        renderAll();
+        showToast(`Renamed student to "${updatedName}".`, "success");
+      });
+
+      // Bind Inline Score Overrides
+      detailPane.querySelectorAll("[data-override-q]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const qId = btn.getAttribute("data-override-q");
+          const newScore = Number(btn.getAttribute("data-override-score"));
+          let resp = (stu.responses || []).find((r) => r.questionId === qId);
+          if (!resp) {
+            resp = { questionId: qId, handwrittenWork: "(Manually scored)", score: newScore, errorType: newScore === 1 ? "none" : "procedural", feedback: "Score updated by teacher." };
+            stu.responses.push(resp);
+          } else {
+            resp.score = newScore;
+            if (newScore === 1) resp.errorType = "none";
+          }
+          await saveAssessment(asmt);
+          renderAll();
+          showToast("Score updated — psychometrics & Bellwethers recalculated!", "success");
+        });
+      });
+    }
+
+    function renderStudentQuestionCard(stu, q) {
+      const resp = (stu.responses || []).find((r) => r.questionId === q.id) || {
+        handwrittenWork: "No work recorded",
+        score: 0,
+        errorType: "none",
+        feedback: ""
+      };
+      const score = Number(resp.score || 0);
+      const statusIcon =
+        score >= 1
+          ? `<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">✓</span>`
+          : score >= 0.5
+          ? `<span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">½</span>`
+          : `<span class="w-6 h-6 rounded-full bg-redpen-light text-redpen flex items-center justify-center font-bold text-xs shrink-0">✗</span>`;
+
+      const errBadge =
+        resp.errorType && resp.errorType !== "none" && score < 1
+          ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold uppercase tracking-wide bg-redpen-light text-redpen border border-redpen-border">${escapeHtml(resp.errorType)}</span>`
+          : "";
+
+      return `
+        <div class="rounded-xl border border-warmborder bg-[#FCFBF8] p-4 space-y-2.5">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              ${statusIcon}
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-sm text-ink">${escapeHtml(q.label)}</span>
+                  <span class="text-xs font-medium text-ink-muted">${escapeHtml(q.topic)}</span>
+                  ${errBadge}
+                </div>
+                ${q.prompt ? `<p class="text-[11px] text-ink-subtle">${escapeHtml(q.prompt)}</p>` : ""}
+              </div>
+            </div>
+
+            <!-- Inline Score Override Buttons -->
+            <div class="inline-flex rounded-lg border border-warmborder bg-white p-0.5 text-[11px] font-semibold shrink-0">
+              <button type="button" data-override-q="${q.id}" data-override-score="1"
+                class="px-2 py-1 rounded-md transition ${score >= 1 ? "bg-forest text-white" : "text-ink-muted hover:bg-[#FAF8F3]"}">
+                Correct
+              </button>
+              <button type="button" data-override-q="${q.id}" data-override-score="0.5"
+                class="px-2 py-1 rounded-md transition ${score === 0.5 ? "bg-amber-600 text-white" : "text-ink-muted hover:bg-[#FAF8F3]"}">
+                Partial 0.5
+              </button>
+              <button type="button" data-override-q="${q.id}" data-override-score="0"
+                class="px-2 py-1 rounded-md transition ${score === 0 ? "bg-redpen text-white" : "text-ink-muted hover:bg-[#FAF8F3]"}">
+                Incorrect
+              </button>
+            </div>
+          </div>
+
+          <div class="pl-8 space-y-1.5">
+            <div class="rounded-lg bg-white border border-warmborder/80 px-3 py-1.5 flex items-baseline gap-2">
+              <span class="text-[11px] uppercase tracking-wider font-semibold text-ink-subtle shrink-0">Wrote:</span>
+              <span class="handwriting-box text-ink">${escapeHtml(resp.handwrittenWork)}</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-muted">
+              <span>${escapeHtml(resp.feedback || "")}</span>
+              <span class="text-[11px] text-forest font-medium">Key: ${escapeHtml(q.correctAnswer || "")}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function exportCsvGradebook() {
+      const asmt = getCurrentAssessment();
+      if (!asmt) return;
+      const psy = computePsychometrics(asmt);
+      const regularQs = asmt.questions.filter((q) => !q.isExtraCredit);
+
+      const headers = ["Student Name", ...regularQs.map((q) => `${q.label} (${q.topic})`), "Total Earned", "Max Points", "Percentage"];
+      const rows = asmt.students.map((stu) => {
+        const st = psy.studentTotals.find((s) => s.studentId === stu.id);
+        const qScores = regularQs.map((q) => {
+          const r = (stu.responses || []).find((x) => x.questionId === q.id);
+          return r ? r.score : 0;
+        });
+        return [
+          `"${stu.name.replace(/"/g, '""')}"`,
+          ...qScores,
+          st ? st.earned : 0,
+          st ? st.max : regularQs.length,
+          st ? `${Math.round(st.pct * 100)}%` : "0%"
+        ].join(",");
+      });
+
+      const csv = [headers.map((h) => `"${h.replace(/"/g, '""')}"`).join(","), ...rows].join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${asmt.name.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_gradebook.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("CSV Gradebook downloaded.", "success");
+    }
+
+    // --- TAB 5: TEST REVISIONS ---
+    function renderRevisionsTab(asmt, psy) {
+      const empty = document.getElementById("revisions-empty");
+      const content = document.getElementById("revisions-content");
+
+      if (!asmt || !psy) {
+        empty.classList.remove("hidden");
+        content.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      content.classList.remove("hidden");
+
+      const rev = asmt.revisionSuggestions || { rewrites: [], structural: [] };
+      const rewritesEl = document.getElementById("revisions-rewrites-list");
+
+      if (rev.rewrites && rev.rewrites.length > 0) {
+        rewritesEl.innerHTML = rev.rewrites
+          .map(
+            (rw) => `
+            <div class="bg-card rounded-2xl border border-warmborder shadow-editorial p-5 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-lg bg-redpen-light text-redpen border border-redpen-border text-xs font-bold">${escapeHtml(rw.questionLabel)}</span>
+                <span class="text-xs font-semibold uppercase tracking-wider text-ink-muted">Recommended Rewrite</span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="rounded-xl bg-[#FAF8F3] border border-warmborder p-3.5">
+                  <p class="text-[11px] font-bold uppercase tracking-wider text-redpen mb-1">Current Psychometric Issue</p>
+                  <p class="text-xs text-ink leading-relaxed">${escapeHtml(rw.currentIssue)}</p>
+                </div>
+                <div class="rounded-xl bg-forest-light/40 border border-forest/20 p-3.5">
+                  <p class="text-[11px] font-bold uppercase tracking-wider text-forest mb-1">Suggested Revision</p>
+                  <p class="text-xs text-ink leading-relaxed">${escapeHtml(rw.suggestedRevision)}</p>
+                </div>
+              </div>
+              <div class="rounded-xl bg-white border border-dashed border-forest/40 px-4 py-3 text-xs">
+                <span class="font-bold text-forest uppercase tracking-wider mr-2">Example Revised Problem:</span>
+                <span class="font-mono text-ink">${escapeHtml(rw.exampleProblem)}</span>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+      } else {
+        rewritesEl.innerHTML = `<div class="bg-card rounded-2xl border border-warmborder p-5 text-sm text-ink-muted">All items performed solidly. Click <strong>Refresh AI Revisions</strong> to generate fresh suggestions based on current psychometrics.</div>`;
+      }
+
+      // Anchor Bellwethers
+      const anchorsEl = document.getElementById("revisions-anchors-list");
+      if (psy.bellwethers.length > 0) {
+        anchorsEl.innerHTML = psy.bellwethers
+          .map(
+            (b) => `
+            <div class="bg-card rounded-2xl border border-forest/30 shadow-editorial p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded-md bg-forest text-white text-xs font-bold">Keep ${escapeHtml(b.label)}</span>
+                <span class="text-xs font-mono font-bold text-forest">D = ${formatDec(b.D)} · p = ${formatPct(b.p)}</span>
+              </div>
+              <h4 class="font-semibold text-sm text-ink">${escapeHtml(b.topic)}</h4>
+              <p class="text-xs text-ink-muted">${escapeHtml(b.explanation)}</p>
+            </div>
+          `
+          )
+          .join("");
+      } else {
+        anchorsEl.innerHTML = `<p class="text-xs text-ink-muted">No anchor bellwethers detected yet.</p>`;
+      }
+
+      // Structural Suggestions
+      const structEl = document.getElementById("revisions-structural-list");
+      if (rev.structural && rev.structural.length > 0) {
+        structEl.innerHTML = rev.structural
+          .map(
+            (tip, i) => `
+            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-[#FAF8F3] border border-warmborder/70">
+              <span class="w-5 h-5 rounded-full bg-forest text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
+              <span class="text-xs sm:text-sm text-ink leading-relaxed">${escapeHtml(tip)}</span>
+            </div>
+          `
+          )
+          .join("");
+      } else {
+        structEl.innerHTML = `<p class="text-xs text-ink-muted italic">No structural recommendations recorded yet.</p>`;
+      }
+    }
+
+    // --- TAB 6: LONGITUDINAL PROGRESS TRACKER ---
+    function renderProgressTab() {
+      const empty = document.getElementById("progress-empty");
+      const content = document.getElementById("progress-content");
+
+      if (state.assessments.length === 0) {
+        empty.classList.remove("hidden");
+        content.classList.add("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      content.classList.remove("hidden");
+
+      // Sort chronologically ascending for trend lines
+      const chrono = [...state.assessments].sort(
+        (a, b) => (a.date || "").localeCompare(b.date || "") || (a.createdAt || 0) - (b.createdAt || 0)
+      );
+
+      // Saved Assessments Manager List
+      const savedEl = document.getElementById("saved-assessments-list");
+      savedEl.innerHTML = [...chrono]
+        .reverse()
+        .map((a) => {
+          const psy = computePsychometrics(a);
+          const isCurrent = a.id === state.currentAssessmentId;
+          return `
+            <div class="flex items-center justify-between gap-2 p-3 rounded-xl border ${isCurrent ? "border-forest bg-forest-light/40" : "border-warmborder bg-[#FAF8F3]"}">
+              <button type="button" data-open-asmt="${a.id}" class="text-left min-w-0 flex-1">
+                <div class="text-xs font-bold text-ink truncate">${escapeHtml(a.name)}</div>
+                <div class="text-[11px] text-ink-muted">${escapeHtml(a.date || "")} · Mean ${psy ? formatPct(psy.meanPct) : "—"}</div>
+              </button>
+              <button type="button" data-delete-asmt="${a.id}" aria-label="Delete assessment"
+                class="p-1.5 rounded-lg text-ink-subtle hover:text-redpen hover:bg-redpen-light transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        })
+        .join("");
+
+      savedEl.querySelectorAll("[data-open-asmt]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.currentAssessmentId = btn.getAttribute("data-open-asmt");
+          state.selectedStudentId = null;
+          renderAll();
+          switchTab("principal");
+        });
+      });
+
+      savedEl.querySelectorAll("[data-delete-asmt]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-delete-asmt");
+          const target = state.assessments.find((x) => x.id === id);
+          openConfirmModal(
+            "Delete Assessment",
+            `Are you sure you want to permanently remove "${target?.name || "this assessment"}" from your term record?`,
+            () => deleteAssessmentById(id)
+          );
+        });
+      });
+
+      // Class Trend Line Chart
+      if (state.charts.classTrend) {
+        state.charts.classTrend.destroy();
+        state.charts.classTrend = null;
+      }
+      const classPoints = chrono.map((a) => {
+        const psy = computePsychometrics(a);
+        return {
+          label: `${a.name.slice(0, 18)}${a.name.length > 18 ? "…" : ""} (${a.date || ""})`,
+          mean: psy ? Math.round(psy.meanPct * 100) : 0,
+          mastery: psy ? Math.round(psy.masteryRate * 100) : 0
+        };
+      });
+
+      const classCtx = document.getElementById("chart-class-trend").getContext("2d");
+      state.charts.classTrend = new Chart(classCtx, {
+        type: "line",
+        data: {
+          labels: classPoints.map((p) => p.label),
+          datasets: [
+            {
+              label: "Class Average (%)",
+              data: classPoints.map((p) => p.mean),
+              borderColor: "#1B4332",
+              backgroundColor: "rgba(27, 67, 50, 0.12)",
+              tension: 0.25,
+              fill: true,
+              pointRadius: 5
+            },
+            {
+              label: "Mastery Rate (≥80%)",
+              data: classPoints.map((p) => p.mastery),
+              borderColor: "#B91C1C",
+              borderDash: [5, 4],
+              tension: 0.25,
+              fill: false,
+              pointRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: (v) => `${v}%` }, grid: { color: "#EFECE4" } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // Collect unique student names across all assessments
+      const studentNamesSet = new Set();
+      chrono.forEach((a) => (a.students || []).forEach((s) => studentNamesSet.add(s.name)));
+      const allStudentNames = Array.from(studentNamesSet).sort((a, b) => a.localeCompare(b));
+
+      const selector = document.getElementById("progress-student-selector");
+      if (!state.progressStudentName || !allStudentNames.includes(state.progressStudentName)) {
+        state.progressStudentName = allStudentNames[0] || null;
+      }
+
+      selector.innerHTML = allStudentNames
+        .map((nm) => `<option value="${escapeHtml(nm)}" ${nm === state.progressStudentName ? "selected" : ""}>${escapeHtml(nm)}</option>`)
+        .join("");
+
+      renderIndividualStudentProgress(chrono, state.progressStudentName);
+    }
+
+    function renderIndividualStudentProgress(chronoAssessments, studentName) {
+      if (!studentName) return;
+
+      const history = [];
+      const errorCounts = { conceptual: 0, procedural: 0, arithmetic: 0, notation: 0 };
+
+      chronoAssessments.forEach((a) => {
+        const psy = computePsychometrics(a);
+        if (!psy) return;
+        const stuObj = (a.students || []).find((s) => s.name.toLowerCase() === studentName.toLowerCase());
+        const stuStat = psy.studentTotals.find((s) => s.name.toLowerCase() === studentName.toLowerCase());
+        if (stuObj && stuStat) {
+          history.push({
+            date: a.date || "",
+            name: a.name,
+            earned: stuStat.earned,
+            max: stuStat.max,
+            pct: stuStat.pct
+          });
+          (stuObj.responses || []).forEach((r) => {
+            if (r.score < 1 && r.errorType && errorCounts[r.errorType] !== undefined) {
+              errorCounts[r.errorType]++;
+            }
+          });
+        }
+      });
+
+      // KPIs
+      const avg = history.length > 0 ? history.reduce((s, h) => s + h.pct, 0) / history.length : 0;
+      const latest = history.length > 0 ? history[history.length - 1].pct : 0;
+      document.getElementById("prog-stu-avg").textContent = formatPct(avg);
+      document.getElementById("prog-stu-latest").textContent = formatPct(latest);
+
+      const trendEl = document.getElementById("prog-stu-trend");
+      if (history.length >= 2) {
+        const diff = Math.round((history[history.length - 1].pct - history[0].pct) * 100);
+        if (diff >= 5) {
+          trendEl.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900">▲ Improving (+${diff}%)</span>`;
+        } else if (diff <= -5) {
+          trendEl.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-redpen-light text-redpen">▼ Needs Attention (${diff}%)</span>`;
+        } else {
+          trendEl.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-stone-200 text-ink">→ Steady (${diff >= 0 ? "+" : ""}${diff}%)</span>`;
+        }
+      } else {
+        trendEl.innerHTML = `<span class="text-xs text-ink-subtle">1 assessment logged</span>`;
+      }
+
+      const sortedErrors = Object.entries(errorCounts).sort((a, b) => b[1] - a[1]);
+      const topErr = sortedErrors[0];
+      document.getElementById("prog-stu-error").textContent =
+        topErr && topErr[1] > 0 ? `${topErr[0]} (${topErr[1]}×)` : "None recorded";
+
+      // Error Frequency Bars
+      const totalErrs = Object.values(errorCounts).reduce((a, b) => a + b, 0);
+      const errBarsEl = document.getElementById("prog-error-bars");
+      if (totalErrs === 0) {
+        errBarsEl.innerHTML = `<p class="text-xs text-emerald-800 font-medium">No recurring errors across logged assessments!</p>`;
+      } else {
+        errBarsEl.innerHTML = sortedErrors
+          .map(([type, count]) => {
+            const pct = Math.round((count / totalErrs) * 100);
+            return `
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="capitalize font-medium text-ink">${type}</span>
+                  <span class="text-ink-muted">${count} (${pct}%)</span>
+                </div>
+                <div class="w-full h-2 bg-[#EFECE4] rounded-full overflow-hidden">
+                  <div class="h-full bg-redpen rounded-full" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      // History Table
+      document.getElementById("prog-history-tbody").innerHTML = [...history]
+        .reverse()
+        .map(
+          (h) => `
+          <tr>
+            <td class="py-2 px-3 text-ink-muted whitespace-nowrap">${escapeHtml(h.date)}</td>
+            <td class="py-2 px-3 font-medium text-ink">${escapeHtml(h.name)}</td>
+            <td class="py-2 px-3 text-right font-bold ${h.pct >= 0.8 ? "text-forest" : "text-redpen"}">${h.earned}/${h.max} (${formatPct(h.pct)})</td>
+          </tr>
+        `
+        )
+        .join("");
+
+      // Student Trajectory Chart
+      if (state.charts.studentTrend) {
+        state.charts.studentTrend.destroy();
+        state.charts.studentTrend = null;
+      }
+      const stuCtx = document.getElementById("chart-student-trend").getContext("2d");
+      state.charts.studentTrend = new Chart(stuCtx, {
+        type: "line",
+        data: {
+          labels: history.map((h) => `${h.name.slice(0, 16)}${h.name.length > 16 ? "…" : ""}`),
+          datasets: [
+            {
+              label: `${studentName} Score (%)`,
+              data: history.map((h) => Math.round(h.pct * 100)),
+              borderColor: "#1B4332",
+              backgroundColor: "rgba(27, 67, 50, 0.14)",
+              tension: 0.25,
+              fill: true,
+              pointRadius: 6,
+              pointBackgroundColor: "#B91C1C",
+              pointBorderColor: "#FFFFFF",
+              pointBorderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: (v) => `${v}%` }, grid: { color: "#EFECE4" } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 9. NAVIGATION & EVENT BINDINGS
+    // =========================================================================
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === tabName);
+      });
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("hidden", panel.id !== `tab-${tabName}`);
+      });
+
+      // Re-render charts cleanly when their tab becomes visible
+      const asmt = getCurrentAssessment();
+      if (tabName === "psychometrics" && asmt) {
+        renderPsychometricCharts(computePsychometrics(asmt));
+      } else if (tabName === "progress" && state.assessments.length > 0) {
+        renderProgressTab();
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function bindEvents() {
+      // Tab Navigation
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
+      });
+
+      // Assessment Switcher
+      document.getElementById("assessment-switcher").addEventListener("change", (e) => {
+        if (!e.target.value) return;
+        state.currentAssessmentId = e.target.value;
+        state.selectedStudentId = null;
+        renderAll();
+      });
+
+      // Demo Batch & New Batch buttons
+      document.getElementById("btn-load-demo").addEventListener("click", loadDemoBatch);
+      document.getElementById("btn-demo-inline").addEventListener("click", loadDemoBatch);
+      document.getElementById("btn-new-assessment").addEventListener("click", () => {
+        switchTab("upload");
+        document.getElementById("input-assessment-name").focus();
+      });
+
+      // Dropzone & File Input
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("file-input");
+
+      dropzone.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", (e) => {
+        handleFilesAdded(e.target.files);
+        fileInput.value = "";
+      });
+
+      ["dragenter", "dragover"].forEach((evt) => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          dropzone.classList.add("dropzone-active");
+        });
+      });
+      ["dragleave", "drop"].forEach((evt) => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("dropzone-active");
+        });
+      });
+      dropzone.addEventListener("drop", (e) => {
+        handleFilesAdded(e.dataTransfer.files);
+      });
+
+      document.getElementById("btn-clear-queue").addEventListener("click", () => {
+        state.queuedPages = [];
+        renderQueueGrid();
+      });
+
+      document.getElementById("btn-grade-batch").addEventListener("click", gradeBatchWithGemini);
+
+      // Principal Findings Narrative Editor & Print
+      const editBtn = document.getElementById("btn-toggle-edit-summary");
+      const summaryDisplay = document.getElementById("memo-summary-display");
+      const summaryEditor = document.getElementById("memo-summary-editor");
+      const summaryTextarea = document.getElementById("memo-summary-textarea");
+
+      editBtn.addEventListener("click", () => {
+        const asmt = getCurrentAssessment();
+        if (!asmt) return;
+        summaryTextarea.value = summaryDisplay.textContent;
+        summaryDisplay.classList.add("hidden");
+        summaryEditor.classList.remove("hidden");
+      });
+
+      document.getElementById("btn-cancel-summary").addEventListener("click", () => {
+        summaryEditor.classList.add("hidden");
+        summaryDisplay.classList.remove("hidden");
+      });
+
+      document.getElementById("btn-save-summary").addEventListener("click", async () => {
+        const asmt = getCurrentAssessment();
+        if (!asmt) return;
+        asmt.executiveSummary = summaryTextarea.value.trim();
+        await saveAssessment(asmt);
+        summaryDisplay.textContent = asmt.executiveSummary;
+        summaryEditor.classList.add("hidden");
+        summaryDisplay.classList.remove("hidden");
+        showToast("Principal Findings narrative saved.", "success");
+      });
+
+      document.getElementById("btn-print-principal").addEventListener("click", () => {
+        window.print();
+      });
+
+      // Students Search, Sort & CSV Export
+      document.getElementById("student-search").addEventListener("input", (e) => {
+        state.studentSearch = e.target.value;
+        const asmt = getCurrentAssessment();
+        if (asmt) renderStudentsTab(asmt, computePsychometrics(asmt));
+      });
+
+      document.getElementById("student-sort").addEventListener("change", (e) => {
+        state.studentSort = e.target.value;
+        const asmt = getCurrentAssessment();
+        if (asmt) renderStudentsTab(asmt, computePsychometrics(asmt));
+      });
+
+      document.getElementById("btn-export-csv").addEventListener("click", exportCsvGradebook);
+
+      // Refresh AI Test Revisions
+      document.getElementById("btn-refresh-revisions").addEventListener("click", refreshAIRevisions);
+
+      // Progress Tracker Student Selector
+      document.getElementById("progress-student-selector").addEventListener("change", (e) => {
+        state.progressStudentName = e.target.value;
+        const chrono = [...state.assessments].sort(
+          (a, b) => (a.date || "").localeCompare(b.date || "") || (a.createdAt || 0) - (b.createdAt || 0)
+        );
+        renderIndividualStudentProgress(chrono, state.progressStudentName);
+      });
+
+      // Custom Confirm Modal
+      document.getElementById("modal-cancel").addEventListener("click", closeConfirmModal);
+      document.getElementById("modal-confirm").addEventListener("click", () => {
+        if (modalConfirmCallback) modalConfirmCallback();
+        closeConfirmModal();
+      });
+    }
+
+    // =========================================================================
+    // 10. BOOTSTRAP ON LOAD
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("input-assessment-date").value = todayISO();
+      bindEvents();
+      if (window.lucide) window.lucide.createIcons();
+      initFirebase();
+    });
+  </script>
+</body>
+</html>
